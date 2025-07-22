@@ -1,6 +1,12 @@
-import { mdiDelete, mdiEye, mdiFilePlusOutline, mdiPencil } from '@mdi/js';
+import {
+  mdiDelete,
+  mdiEye,
+  mdiFilePlusOutline,
+  mdiPencil,
+  mdiPlay,
+} from '@mdi/js';
 import BadgeStatus from '../components/BadgeStatus';
-import { useDeleteTicket, useGetTickets } from '../tickets.query';
+import { useDeleteTicket, useGetTickets, usePutTicket } from '../tickets.query';
 import { TicketT } from '../tickets.type';
 import TableCustom, { Columns } from '@/components/tableCustom';
 import BaseActions from '@/components/ui/BaseActions';
@@ -8,12 +14,16 @@ import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
+import useConfirmationModal from '@/components/ui/modals/hooks/useConfirmationModal';
 
 export default function TicketList() {
   const { data, isLoading } = useGetTickets();
   const deleteTicket = useDeleteTicket();
+  const putTicket = usePutTicket();
   const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
     useConfirmationDeleteModal();
+  const { openModal: openConfirmStateModal, Modal: ConfirmStateModal } =
+    useConfirmationModal();
 
   const columns: Columns = [
     {
@@ -81,14 +91,53 @@ export default function TicketList() {
               small
             />
 
-            <BaseButton
-              href={`/tickets/${info.id}`}
-              color="warning"
-              icon={mdiPencil}
-              label="Editar"
-              roundedFull
-              small
-            />
+            {/* Mostrar botón 'Editar' solo si el ticket NO está cerrado */}
+            {info.status !== 'closed' && (
+              <BaseButton
+                href={`/tickets/${info.id}`}
+                color="warning"
+                icon={mdiPencil}
+                label="Editar"
+                roundedFull
+                small
+              />
+            )}
+
+            {/* Mostrar botón 'En Progreso' solo si el ticket NO está en progreso ni cerrado */}
+            {info.status !== 'in_progress' && info.status !== 'closed' && (
+              <BaseButton
+                color="success"
+                icon={mdiPlay}
+                label="En Progreso"
+                onClick={() =>
+                  openConfirmStateModal({
+                    onConfirm: () => {
+                      putTicket.mutate({ ...info, status: 'in_progress' });
+                    },
+                    message:
+                      '¿Estás seguro que deseas poner este ticket EN PROGRESO?',
+                    title: 'Confirmar cambio de estado',
+                    buttonColor: 'success',
+                    buttonLabel: 'Sí, poner en progreso',
+                    buttonCancelLabel: 'Cancelar',
+                  })
+                }
+                roundedFull
+                small
+              />
+            )}
+
+            {/* Mostrar botón 'Cerrar Ticket' solo si el ticket está en progreso */}
+            {info.status === 'in_progress' && (
+              <BaseButton
+                color="info"
+                icon={mdiPencil}
+                label="Cerrar Ticket"
+                href={`/tickets/${info.id}/close`}
+                roundedFull
+                small
+              />
+            )}
 
             <BaseButton
               color="danger"
@@ -122,6 +171,7 @@ export default function TicketList() {
       </SectionTitleLineWithButton>
       <TableCustom columns={columns} data={data} />
       <ConfirmationModal />
+      <ConfirmStateModal />
     </SectionCustom>
   );
 }

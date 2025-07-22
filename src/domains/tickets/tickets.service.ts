@@ -41,6 +41,17 @@ export const updateTicket = async (data: TicketT) => {
   return resp as TicketT;
 };
 
+export const changeTicketStatus = async (data: TicketT) => {
+  const resp = await apiFetch({
+    url: `${baseURL}/${data.id}/status`,
+    method: 'PUT',
+    body: {
+      status: data.status,
+    },
+  });
+  return resp as TicketT;
+};
+
 export const deleteTicket = async (id: number) => {
   const resp = await apiFetch({
     url: `${baseURL}/${id}`,
