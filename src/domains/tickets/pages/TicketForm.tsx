@@ -1,6 +1,6 @@
 import { mdiTableBorder } from '@mdi/js';
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
 import { useUserOptions } from '../hooks/useUserOptions';
 import {
@@ -27,6 +27,7 @@ import { useAddToast } from '@/domains/toast';
 import { EMPTY_STRING } from '@/utils/constants';
 
 export default function TicketForm() {
+  const navigate = useNavigate();
   const postTicket = usePostTicket();
   const putTicket = usePutTicket();
   const postTicketEvidence = usePostTicketEvidence();
@@ -87,7 +88,7 @@ export default function TicketForm() {
         success('Ticket guardado correctamente');
       }
 
-      /*  */
+      navigate('/tickets');
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {
