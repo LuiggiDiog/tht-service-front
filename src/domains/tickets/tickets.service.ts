@@ -1,4 +1,9 @@
-import { TicketEvidenceT, TicketPartChangeT, TicketT } from './tickets.type';
+import {
+  TicketDetailT,
+  TicketEvidenceT,
+  TicketPartChangeT,
+  TicketT,
+} from './tickets.type';
 import apiFetch from '@/services';
 
 const baseURL = `/tickets`;
@@ -15,7 +20,7 @@ export const getTicket = async (id: number) => {
   const resp = await apiFetch({
     url: `${baseURL}/${id}`,
   });
-  return resp as TicketT;
+  return resp as TicketDetailT;
 };
 
 export const postTicket = async (data: TicketT) => {

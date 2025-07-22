@@ -10,6 +10,7 @@ import {
   postTicketEvidence,
   updateTicket,
 } from './tickets.service';
+import { TicketDetailT } from './tickets.type';
 
 export const KEY_QUERY_TICKETS = 'tickets';
 
@@ -28,7 +29,7 @@ export function useGetTicket(id: number | string | undefined) {
     queryKey: [KEY_QUERY_TICKETS, id],
     queryFn: () => getTicket(idValue),
     enabled: !!idValue,
-  });
+  }) as { data: TicketDetailT | undefined; isLoading: boolean; error: unknown };
 }
 
 export function usePostTicket() {

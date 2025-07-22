@@ -1,4 +1,4 @@
-import { mdiDelete, mdiFilePlusOutline, mdiPencil } from '@mdi/js';
+import { mdiDelete, mdiEye, mdiFilePlusOutline, mdiPencil } from '@mdi/js';
 import BadgeStatus from '../components/BadgeStatus';
 import { useDeleteTicket, useGetTickets } from '../tickets.query';
 import { TicketT } from '../tickets.type';
@@ -72,6 +72,15 @@ export default function TicketList() {
         const info = row.original as TicketT;
         return (
           <BaseActions>
+            <BaseButton
+              href={`/tickets/${info.id}/view`}
+              color="info"
+              icon={mdiEye}
+              label="Ver"
+              roundedFull
+              small
+            />
+
             <BaseButton
               href={`/tickets/${info.id}`}
               color="warning"
