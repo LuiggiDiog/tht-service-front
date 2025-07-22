@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { Login } from '@/domains/auth';
+import { CustomerForm, CustomersList } from '@/domains/customers';
 import { ItemsByLot } from '@/domains/items';
 import {
   LotForm,
@@ -51,6 +52,10 @@ export default function RootRouter() {
             <Route path="/users" element={<UsersList />} />
             <Route path="/users/new" element={<UserForm />} />
             <Route path="/users/:id" element={<UserForm />} />
+
+            <Route path="/customers" element={<CustomersList />} />
+            <Route path="/customers/new" element={<CustomerForm />} />
+            <Route path="/customers/:id" element={<CustomerForm />} />
 
             <Route path="/products" element={<ProductList />} />
             <Route path="/products/new" element={<ProductForm />} />

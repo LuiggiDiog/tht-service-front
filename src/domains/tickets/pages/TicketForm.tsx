@@ -22,6 +22,7 @@ import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButt
 import BaseButton from '@/components/ui/baseButton';
 import LoadingOverlay from '@/components/ui/loadings/LoadingOverlay';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
+import { useCustomerOptions } from '@/domains/customers';
 import { useAddToast } from '@/domains/toast';
 import { imageToBase64 } from '@/utils/ImagesUtils';
 import { EMPTY_STRING } from '@/utils/constants';
@@ -36,6 +37,7 @@ export default function TicketForm() {
   const { id } = useParams();
   const { data, isLoading } = useGetTicket(id);
   const { userOptions } = useUserOptions();
+  const { customerOptions } = useCustomerOptions();
 
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
   const [isLoadingUpload, setIsLoadingUpload] = useState(false);
@@ -141,7 +143,7 @@ export default function TicketForm() {
         <Field
           name="customer_id"
           component={SelectField}
-          options={userOptions}
+          options={customerOptions}
           placeholder="Selecciona un cliente"
         />
       </FormField>

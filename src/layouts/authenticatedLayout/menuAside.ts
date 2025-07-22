@@ -39,6 +39,11 @@ const menuAside: MenuAsideItem[] = [
     href: '/users',
   },
   {
+    label: 'Clientes',
+    icon: mdiAccountMultiple,
+    href: '/customers',
+  },
+  {
     label: 'Tickets',
     icon: mdiTicket,
     href: '/tickets',
