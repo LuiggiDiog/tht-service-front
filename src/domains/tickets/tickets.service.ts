@@ -46,10 +46,25 @@ export const deleteTicket = async (id: number) => {
 
 // Rutas para evidencias
 export const postTicketEvidence = async (data: TicketEvidenceT) => {
+  const formData = new FormData();
+
+  // Agregar campos básicos que irán a req.body
+  formData.append('ticket_id', data.ticket_id.toString());
+  formData.append('type', data.type);
+  formData.append('user_id', data.user_id.toString());
+  formData.append('comment', data.comment);
+
+  // Agregar archivos que irán a req.files
+  if (data.files && data.files.length > 0) {
+    for (const file of data.files) {
+      formData.append('files', file);
+    }
+  }
+
   const resp = await apiFetch({
     url: `${baseURL}/evidences`,
     method: 'POST',
-    body: data,
+    body: formData,
   });
   return resp as TicketEvidenceT;
 };

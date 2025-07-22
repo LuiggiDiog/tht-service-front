@@ -20,5 +20,13 @@ export function useAddToast() {
     });
   }
 
-  return { success, warning };
+  function error(message: string) {
+    addToast({
+      description: message,
+      color: 'danger',
+      icon: mdiCheckCircle,
+    });
+  }
+
+  return { success, warning, error };
 }

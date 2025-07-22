@@ -6,6 +6,9 @@ export type TicketT = {
   description: string;
   created_at: string;
   updated_at: string;
+
+  evidence_comment: string;
+  evidence_type: 'reception' | 'part_removed' | 'part_installed' | 'delivery';
 };
 
 export type TicketEvidenceT = {
@@ -14,9 +17,10 @@ export type TicketEvidenceT = {
   type: 'reception' | 'part_removed' | 'part_installed' | 'delivery';
   user_id: number;
   comment: string;
-  media: string[];
   created_at: string;
   updated_at: string;
+
+  files: File[];
 };
 
 export type TicketPartChangeT = {

@@ -1,6 +1,6 @@
 import { mdiTableBorder } from '@mdi/js';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import * as Yup from 'yup';
 import { useUserOptions } from '../hooks/useUserOptions';
 import {
@@ -14,9 +14,9 @@ import Form, {
   Field,
   FormField,
   SelectField,
-  UploadMultipleFilesDropZone,
   ValuesFormT,
 } from '@/components/form';
+import { UploadFilesFormData } from '@/components/form/components/uploadFile';
 import BaseDivider from '@/components/ui/BaseDivider';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
@@ -24,15 +24,13 @@ import LoadingOverlay from '@/components/ui/loadings/LoadingOverlay';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
 import { useCustomerOptions } from '@/domains/customers';
 import { useAddToast } from '@/domains/toast';
-import { imageToBase64 } from '@/utils/ImagesUtils';
 import { EMPTY_STRING } from '@/utils/constants';
 
 export default function TicketForm() {
-  const navigate = useNavigate();
   const postTicket = usePostTicket();
   const putTicket = usePutTicket();
   const postTicketEvidence = usePostTicketEvidence();
-  const { warning, success } = useAddToast();
+  const { success } = useAddToast();
 
   const { id } = useParams();
   const { data, isLoading } = useGetTicket(id);
@@ -40,7 +38,6 @@ export default function TicketForm() {
   const { customerOptions } = useCustomerOptions();
 
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
-  const [isLoadingUpload, setIsLoadingUpload] = useState(false);
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
 
   const schema = Yup.object().shape({
@@ -57,13 +54,6 @@ export default function TicketForm() {
 
   const submit = async (values: ValuesFormT) => {
     try {
-      if (isLoadingUpload) {
-        warning(
-          'Por favor espera a que se completen las optimizaciones de las imágenes'
-        );
-        return;
-      }
-
       setIsLoadingGeneral(true);
 
       const json = values as TicketT;
@@ -79,13 +69,6 @@ export default function TicketForm() {
 
       // Si hay archivos de evidencia, registrarlos
       if (evidenceFiles.length > 0 && values.evidence_comment) {
-        const mediaBase64: string[] = [];
-
-        for (const file of evidenceFiles) {
-          const base64 = await imageToBase64(file);
-          mediaBase64.push(base64);
-        }
-
         const evidenceData: Partial<TicketEvidenceT> = {
           ticket_id: resp.id,
           type: values.evidence_type as
@@ -94,8 +77,8 @@ export default function TicketForm() {
             | 'part_installed'
             | 'delivery',
           comment: values.evidence_comment as string,
-          media: mediaBase64,
           user_id: values.technician_id as number, // Asumimos que el técnico sube la evidencia
+          files: evidenceFiles,
         };
 
         await postTicketEvidence.mutateAsync(evidenceData as TicketEvidenceT);
@@ -104,10 +87,9 @@ export default function TicketForm() {
         success('Ticket guardado correctamente');
       }
 
-      navigate('/tickets');
+      /*  */
     } catch (error) {
       console.error('Error submitting form:', error);
-      warning('Error al guardar el ticket');
     } finally {
       setIsLoadingGeneral(false);
     }
@@ -119,9 +101,9 @@ export default function TicketForm() {
 
   const getTitle = () => {
     if (id) {
-      return `Editar ticket ${data?.id}`;
+      return `Editar Ticket ${data?.id}`;
     }
-    return 'Nuevo ticket';
+    return 'Nuevo Ticket';
   };
 
   if (isLoading) {
@@ -174,12 +156,13 @@ export default function TicketForm() {
             { value: 'in_progress', label: 'En Progreso' },
             { value: 'closed', label: 'Cerrado' },
           ]}
+          isDisabled={!id}
         />
       </FormField>
 
       <BaseDivider />
 
-      <h3 className="text-lg font-semibold mb-4">Evidencias del Ticket</h3>
+      <h3 className="text-lg font-semibold mb-4">Evidencias de Ingreso</h3>
 
       <FormField label="Tipo de Evidencia">
         <Field
@@ -191,6 +174,7 @@ export default function TicketForm() {
             { value: 'part_installed', label: 'Pieza Instalada' },
             { value: 'delivery', label: 'Entrega' },
           ]}
+          isDisabled={!id}
         />
       </FormField>
 
@@ -206,12 +190,11 @@ export default function TicketForm() {
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Archivos de Evidencia
         </label>
-        <UploadMultipleFilesDropZone
+        <UploadFilesFormData
           message="Arrastra las imágenes de evidencia aquí"
-          onDrop={handleEvidenceDrop}
+          onFilesChange={handleEvidenceDrop}
           type="image"
           maxFiles={3}
-          setLoading={setIsLoadingUpload}
         />
       </div>
 
