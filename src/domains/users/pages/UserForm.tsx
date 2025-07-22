@@ -1,5 +1,4 @@
 import { mdiTableBorder } from '@mdi/js';
-import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
 import { UserT } from '../user.type';
@@ -13,8 +12,6 @@ import Form, {
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
-import { useLocationOptions } from '@/domains/locations';
-import { useRoleOptions } from '@/domains/roles/hooks/useRoleOptions';
 import { EMPTY_STRING } from '@/utils/constants';
 
 export default function UserForm() {
@@ -24,32 +21,22 @@ export default function UserForm() {
 
   const { id } = useParams();
   const { data, isLoading } = useGetUser(id);
-  const { locationOptions } = useLocationOptions();
-  const { roleOptions } = useRoleOptions();
-
-  const current = useMemo(() => {
-    if (!data) return null;
-    return {
-      ...data,
-      role_id: data.roles[0]?.id,
-    };
-  }, [data]);
 
   const schema = Yup.object().shape({
     name: Yup.string().required('Requerido').default(EMPTY_STRING),
-    last_name: Yup.string().required('Requerido').default(EMPTY_STRING),
     email: Yup.string()
       .email('Email inválido')
       .required('Requerido')
       .default(EMPTY_STRING),
-    location_id: Yup.number().required('Requerido'),
-    password: Yup.string().default(EMPTY_STRING),
-    role_id: Yup.number().required('Requerido'),
+    password: Yup.string().required('Requerido').default(EMPTY_STRING),
+    role: Yup.string().required('Requerido').default('support'),
+    status: Yup.string().required('Requerido').default('active'),
   });
 
   const submit = async (values: ValuesFormT) => {
     const json = values as UserT;
     json.id = parseInt(id as string);
+
     const resp = id
       ? await putUser.mutateAsync(json)
       : await postUser.mutateAsync(json);
@@ -69,7 +56,7 @@ export default function UserForm() {
   };
 
   return (
-    <Form data={current} onSubmit={submit} schema={schema}>
+    <Form data={data} onSubmit={submit} schema={schema}>
       <SectionTitleLineWithButton
         backBtn
         main
@@ -83,28 +70,12 @@ export default function UserForm() {
         <Field name="name" label="Nombre" placeholder="Nombre del usuario" />
       </FormField>
 
-      <FormField label="Apellido">
-        <Field
-          name="last_name"
-          label="Apellido"
-          placeholder="Apellido del usuario"
-        />
-      </FormField>
-
       <FormField label="Email">
         <Field
           name="email"
           label="Email"
           placeholder="Email del usuario"
           type="email"
-        />
-      </FormField>
-
-      <FormField label="Ubicación">
-        <Field
-          name="location_id"
-          component={SelectField}
-          options={locationOptions}
         />
       </FormField>
 
@@ -118,7 +89,26 @@ export default function UserForm() {
       </FormField>
 
       <FormField label="Rol">
-        <Field name="role_id" component={SelectField} options={roleOptions} />
+        <Field
+          name="role"
+          component={SelectField}
+          options={[
+            { label: 'Administrador', value: 'admin' },
+            { label: 'Gerente', value: 'manager' },
+            { label: 'Soporte', value: 'support' },
+          ]}
+        />
+      </FormField>
+
+      <FormField label="Estado">
+        <Field
+          name="status"
+          component={SelectField}
+          options={[
+            { label: 'Activo', value: 'active' },
+            { label: 'Inactivo', value: 'inactive' },
+          ]}
+        />
       </FormField>
     </Form>
   );

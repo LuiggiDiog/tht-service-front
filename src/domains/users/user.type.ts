@@ -1,15 +1,10 @@
-import { RoleT } from '../roles/roles.type';
-
 export type UserT = {
   id: number;
-  location_id: number;
-  role_id: number;
-  email: string;
   name: string;
-  last_name: string;
-  password?: string;
-  state: string;
-  status: string;
+  email: string;
+  password_hash: string;
   role: string;
-  roles: RoleT[];
+  status: 'active' | 'inactive';
+  created_at: string;
+  updated_at: string;
 };

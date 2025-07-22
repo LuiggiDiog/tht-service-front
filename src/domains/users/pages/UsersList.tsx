@@ -34,16 +34,18 @@ export default function UsersList() {
         const info = row.original as UserT;
         return (
           <BaseActions>
-            <BaseButton
-              href={`/users/${info.id}`}
-              color="warning"
-              icon={mdiPencil}
-              label="Editar"
-              roundedFull
-              small
-            />
+            {Number(info.id) !== 1 && (
+              <BaseButton
+                href={`/users/${info.id}`}
+                color="warning"
+                icon={mdiPencil}
+                label="Editar"
+                roundedFull
+                small
+              />
+            )}
 
-            {info.id !== 1 && (
+            {Number(info.id) !== 1 && (
               <BaseButton
                 color="danger"
                 icon={mdiDelete}
