@@ -23,7 +23,7 @@ export default function CustomerForm() {
   const navigate = useNavigate();
   const postCustomer = usePostCustomer();
   const putCustomer = usePutCustomer();
-  const { warning, success } = useAddToast();
+  const { success } = useAddToast();
 
   const { id } = useParams();
   const { data, isLoading } = useGetCustomer(id);
@@ -59,7 +59,6 @@ export default function CustomerForm() {
       navigate('/customers');
     } catch (error) {
       console.error('Error submitting form:', error);
-      warning('Error al guardar el cliente');
     }
   };
 

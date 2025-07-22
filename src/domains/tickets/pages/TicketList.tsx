@@ -161,11 +161,11 @@ export default function TicketList() {
 
   return (
     <SectionCustom isLoading={isLoading}>
-      <SectionTitleLineWithButton main title="Lista de tickets">
+      <SectionTitleLineWithButton main title="Lista de Tickets">
         <BaseButton
           href="/tickets/new"
           roundedFull
-          label="Nuevo ticket"
+          label="Nuevo Ticket"
           icon={mdiFilePlusOutline}
         />
       </SectionTitleLineWithButton>

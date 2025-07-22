@@ -68,7 +68,7 @@ export default function CustomersList() {
         return (
           <BaseActions>
             <BaseButton
-              href={`/customers/${customer.id}/edit`}
+              href={`/customers/${customer.id}`}
               color="warning"
               icon={mdiPencil}
               label="Editar"
