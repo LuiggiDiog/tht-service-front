@@ -11,6 +11,7 @@ import {
 import { ProductForm, ProductList } from '@/domains/products';
 import { RegisterByItem } from '@/domains/registers';
 import { useSettingStore } from '@/domains/settings';
+import { TicketForm, TicketList } from '@/domains/tickets';
 import { UserForm, UsersList } from '@/domains/users';
 import { WarehousesList } from '@/domains/warehouses';
 import Authenticated from '@/layouts/authenticatedLayout';
@@ -54,6 +55,10 @@ export default function RootRouter() {
             <Route path="/products" element={<ProductList />} />
             <Route path="/products/new" element={<ProductForm />} />
             <Route path="/products/:id" element={<ProductForm />} />
+
+            <Route path="/tickets" element={<TicketList />} />
+            <Route path="/tickets/new" element={<TicketForm />} />
+            <Route path="/tickets/:id" element={<TicketForm />} />
 
             <Route path="/warehouses" element={<WarehousesList />} />
 

@@ -1,4 +1,4 @@
-import { mdiAccountMultiple } from '@mdi/js';
+import { mdiAccountMultiple, mdiTicket } from '@mdi/js';
 
 export type ColorButtonKey =
   | 'white'
@@ -37,6 +37,11 @@ const menuAside: MenuAsideItem[] = [
     label: 'Usuarios',
     icon: mdiAccountMultiple,
     href: '/users',
+  },
+  {
+    label: 'Tickets',
+    icon: mdiTicket,
+    href: '/tickets',
   },
   /* {
     label: 'Tiendas',
