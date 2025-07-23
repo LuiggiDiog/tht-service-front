@@ -125,8 +125,12 @@ export default function CustomerForm() {
         />
       </FormField>
 
-      <FormField label="RFC">
-        <Field name="rfc" label="RFC" placeholder="RFC del cliente" />
+      <FormField label="Identificación">
+        <Field
+          name="rfc"
+          label="Identificación"
+          placeholder="Identificación del cliente"
+        />
       </FormField>
 
       <FormField label="Estado">

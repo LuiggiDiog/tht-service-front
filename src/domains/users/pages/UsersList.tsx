@@ -7,10 +7,11 @@ import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
+import { getBranchLabel } from '@/domains/branch';
+import { getRoleLabel } from '@/domains/roles';
 
 export default function UsersList() {
   const { data, isLoading } = useGetUsers();
-  console.log(data);
   const deleteUser = useDeleteUser();
   const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
     useConfirmationDeleteModal();
@@ -23,6 +24,22 @@ export default function UsersList() {
     {
       header: 'Nombre',
       accessorKey: 'name',
+    },
+    {
+      header: 'Sucursal',
+      accessorKey: 'branch',
+      cell: ({ row }) => {
+        const info = row.original as UserT;
+        return <>{getBranchLabel(info.branch)}</>;
+      },
+    },
+    {
+      header: 'Rol',
+      accessorKey: 'role',
+      cell: ({ row }) => {
+        const info = row.original as UserT;
+        return <>{getRoleLabel(info.role)}</>;
+      },
     },
     {
       header: 'Email',

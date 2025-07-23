@@ -92,7 +92,7 @@ export default function TicketList() {
             />
 
             {/* Mostrar botón 'Editar' solo si el ticket NO está cerrado */}
-            {info.status !== 'closed' && (
+            {/* {info.status !== 'closed' && (
               <BaseButton
                 href={`/tickets/${info.id}`}
                 color="warning"
@@ -101,7 +101,7 @@ export default function TicketList() {
                 roundedFull
                 small
               />
-            )}
+            )} */}
 
             {/* Mostrar botón 'En Progreso' solo si el ticket NO está en progreso ni cerrado */}
             {info.status !== 'in_progress' && info.status !== 'closed' && (

@@ -12,6 +12,8 @@ import Form, {
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
+import { useBranchOptions } from '@/domains/branch';
+import { useRoleOptions } from '@/domains/roles';
 import { EMPTY_STRING } from '@/utils/constants';
 
 export default function UserForm() {
@@ -21,6 +23,8 @@ export default function UserForm() {
 
   const { id } = useParams();
   const { data, isLoading } = useGetUser(id);
+  const { branchOptions } = useBranchOptions();
+  const { roleOptions } = useRoleOptions();
 
   const schema = Yup.object().shape({
     name: Yup.string().required('Requerido').default(EMPTY_STRING),
@@ -28,8 +32,9 @@ export default function UserForm() {
       .email('Email inválido')
       .required('Requerido')
       .default(EMPTY_STRING),
-    password: Yup.string().required('Requerido').default(EMPTY_STRING),
+    branch: Yup.string().required('Requerido').default(EMPTY_STRING),
     role: Yup.string().required('Requerido').default('support'),
+    password: Yup.string().required('Requerido').default(EMPTY_STRING),
     status: Yup.string().required('Requerido').default('active'),
   });
 
@@ -79,24 +84,20 @@ export default function UserForm() {
         />
       </FormField>
 
+      <FormField label="Sucursal">
+        <Field name="branch" component={SelectField} options={branchOptions} />
+      </FormField>
+
+      <FormField label="Rol">
+        <Field name="role" component={SelectField} options={roleOptions} />
+      </FormField>
+
       <FormField label="Contraseña">
         <Field
           name="password"
           label="Contraseña"
           placeholder="Contraseña del usuario"
           /* type="password" */
-        />
-      </FormField>
-
-      <FormField label="Rol">
-        <Field
-          name="role"
-          component={SelectField}
-          options={[
-            { label: 'Administrador', value: 'admin' },
-            { label: 'Gerente', value: 'manager' },
-            { label: 'Soporte', value: 'support' },
-          ]}
         />
       </FormField>
 

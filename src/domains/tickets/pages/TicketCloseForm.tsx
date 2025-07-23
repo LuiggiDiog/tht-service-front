@@ -60,7 +60,7 @@ export default function TicketCloseForm() {
           type: 'delivery',
           comment: values.evidence_comment as string,
           files: evidenceFiles,
-          user_id: currentUser?.id ?? 0,
+          created_by: (currentUser?.id ?? 0).toString(),
         };
         await postTicketEvidence.mutateAsync(evidenceData as TicketEvidenceT);
         success('Ticket cerrado y evidencia guardada correctamente');

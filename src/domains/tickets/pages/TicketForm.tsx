@@ -24,6 +24,7 @@ import LoadingOverlay from '@/components/ui/loadings/LoadingOverlay';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
 import { useCustomerOptions } from '@/domains/customers';
 import { useAddToast } from '@/domains/toast';
+import { usePaymentMethodOptions } from '@/payments';
 import { EMPTY_STRING } from '@/utils/constants';
 
 export default function TicketForm() {
@@ -37,6 +38,7 @@ export default function TicketForm() {
   const { data, isLoading } = useGetTicket(id);
   const { userOptions } = useUserOptions();
   const { customerOptions } = useCustomerOptions();
+  const { paymentMethodOptions } = usePaymentMethodOptions();
 
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -44,13 +46,19 @@ export default function TicketForm() {
   const schema = Yup.object().shape({
     customer_id: Yup.number().required('Requerido'),
     technician_id: Yup.number().required('Requerido'),
-    status: Yup.string().required('Requerido').default('open'),
+    device_model: Yup.string().required('Requerido'),
+    device_serial: Yup.string().required('Requerido'),
     description: Yup.string()
       .required('Requerido')
       .default(EMPTY_STRING)
       .min(10, 'Mínimo 10 caracteres'),
-    evidence_comment: Yup.string().default(EMPTY_STRING),
+    amount: Yup.number().required('Requerido'),
+    payment_method: Yup.string().required('Requerido'),
+    payment_first_amount: Yup.number().required('Requerido'),
+    status: Yup.string().required('Requerido').default('open'),
+
     evidence_type: Yup.string().default('reception'),
+    evidence_comment: Yup.string().default(EMPTY_STRING),
   });
 
   const submit = async (values: ValuesFormT) => {
@@ -72,13 +80,8 @@ export default function TicketForm() {
       if (evidenceFiles.length > 0 && values.evidence_comment) {
         const evidenceData: Partial<TicketEvidenceT> = {
           ticket_id: resp.id,
-          type: values.evidence_type as
-            | 'reception'
-            | 'part_removed'
-            | 'part_installed'
-            | 'delivery',
+          type: 'reception',
           comment: values.evidence_comment as string,
-          user_id: values.technician_id as number, // Asumimos que el técnico sube la evidencia
           files: evidenceFiles,
         };
 
@@ -140,6 +143,22 @@ export default function TicketForm() {
         />
       </FormField>
 
+      <FormField label="Modelo de dispositivo">
+        <Field
+          name="device_model"
+          label="Modelo de dispositivo"
+          placeholder="Modelo de dispositivo"
+        />
+      </FormField>
+
+      <FormField label="Serial de dispositivo">
+        <Field
+          name="device_serial"
+          label="Serial de dispositivo"
+          placeholder="Serial de dispositivo"
+        />
+      </FormField>
+
       <FormField label="Descripción" hasTextareaHeight>
         <Field
           name="description"
@@ -148,15 +167,34 @@ export default function TicketForm() {
         />
       </FormField>
 
+      <FormField label="Precio">
+        <Field
+          name="amount"
+          label="Precio"
+          placeholder="Precio"
+          type="number"
+          step={0.01}
+        />
+      </FormField>
+
+      <FormField label="Método de pago">
+        <Field
+          name="payment_method"
+          component={SelectField}
+          options={paymentMethodOptions}
+          placeholder="Selecciona un método de pago"
+        />
+      </FormField>
+
+      <FormField label="Pago">
+        <Field name="payment_first_amount" label="Pago" placeholder="Pago" />
+      </FormField>
+
       <FormField label="Estado">
         <Field
           name="status"
           component={SelectField}
-          options={[
-            { value: 'open', label: 'Abierto' },
-            { value: 'in_progress', label: 'En Progreso' },
-            { value: 'closed', label: 'Cerrado' },
-          ]}
+          options={[{ value: 'open', label: 'Abierto' }]}
           isDisabled={!id}
         />
       </FormField>
@@ -169,12 +207,7 @@ export default function TicketForm() {
         <Field
           name="evidence_type"
           component={SelectField}
-          options={[
-            { value: 'reception', label: 'Recepción' },
-            { value: 'part_removed', label: 'Pieza Removida' },
-            { value: 'part_installed', label: 'Pieza Instalada' },
-            { value: 'delivery', label: 'Entrega' },
-          ]}
+          options={[{ value: 'reception', label: 'Recepción' }]}
           isDisabled={!id}
         />
       </FormField>

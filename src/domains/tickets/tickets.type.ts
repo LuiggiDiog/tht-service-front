@@ -1,14 +1,25 @@
+import { CustomerT } from '../customers';
+import { UserT } from '../users';
+
 export type TicketT = {
   id: number;
   customer_id: number;
   technician_id: number;
-  status: 'open' | 'in_progress' | 'closed';
+
+  device_model: string;
+  device_serial: string;
+
   description: string;
+  amount: number;
+
+  payment_method: string;
+  payment_first_amount: number;
+  payment_second_amount?: number;
+
+  status: string;
+  created_by: number;
   created_at: string;
   updated_at: string;
-
-  evidence_comment: string;
-  evidence_type: 'reception' | 'part_removed' | 'part_installed' | 'delivery';
 };
 
 // Nuevo tipo para ticket con información completa
@@ -16,29 +27,32 @@ export type TicketDetailT = {
   id: string;
   customer_id: string;
   technician_id: string;
-  status: 'open' | 'in_progress' | 'closed';
+  device_model: string;
+  device_serial: string;
   description: string;
+  amount: string;
+  payment_method: string;
+  payment_first_amount: string;
+  payment_second_amount: string;
+  status: string;
+  created_by: string;
   created_at: string;
   updated_at: string;
-  customer: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-  technician: {
-    name: string;
-    email: string;
-  };
-  evidences: TicketEvidenceDetailT[];
+  customer: CustomerT;
+  technician: UserT;
+  evidences: TicketEvidenceT[];
   part_changes: TicketPartChangeT[];
 };
 
 export type TicketEvidenceT = {
   id: number;
   ticket_id: number;
-  type: 'reception' | 'part_removed' | 'part_installed' | 'delivery';
-  user_id: number;
+
+  type: string;
   comment: string;
+
+  status: string;
+  created_by: string;
   created_at: string;
   updated_at: string;
 
@@ -63,6 +77,19 @@ export type TicketEvidenceDetailT = {
     created_at: string;
     updated_at: string;
   }[];
+};
+
+// Nuevo tipo para media de evidencia
+export type TicketEvidenceMediaT = {
+  id: number;
+  evidence_id: number;
+
+  media_type: string;
+  storage_id: string;
+  url: string;
+
+  created_at: string;
+  updated_at: string;
 };
 
 export type TicketPartChangeT = {
