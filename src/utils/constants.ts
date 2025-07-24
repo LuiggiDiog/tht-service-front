@@ -13,3 +13,5 @@ export const TWO = 2;
 export const HUNDRED = 100;
 
 export const IMAGE_FILE_TYPES = ['png', 'jpg', 'jpeg'];
+export const VIDEO_FILE_TYPES = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+export const MEDIA_FILE_TYPES = [...IMAGE_FILE_TYPES, ...VIDEO_FILE_TYPES];

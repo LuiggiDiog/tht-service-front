@@ -393,6 +393,15 @@ export default function TicketDetail() {
                             className="w-full h-72 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity shadow-md"
                             onClick={() => window.open(media.url, '_blank')}
                           />
+                        ) : media.media_type === 'video' ? (
+                          <video
+                            src={media.url}
+                            controls
+                            className="w-full h-72 rounded-lg shadow-md"
+                            preload="metadata"
+                          >
+                            Tu navegador no soporta la reproducción de videos.
+                          </video>
                         ) : (
                           <div
                             className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-md"

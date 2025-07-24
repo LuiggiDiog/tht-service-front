@@ -184,8 +184,7 @@ export default function TicketCloseForm() {
         <UploadFilesFormData
           message="Arrastra las imágenes de evidencia aquí"
           onFilesChange={handleEvidenceDrop}
-          type="image"
-          maxFiles={3}
+          type="media"
         />
       </div>
 

@@ -62,7 +62,7 @@ export default function TicketEvidenceForm() {
       }
 
       success('Evidencia guardada correctamente');
-      navigate(`/tickets/${id}`);
+      navigate(`/tickets`);
     } catch (error) {
       console.error('Error submitting evidence:', error);
     } finally {
@@ -176,8 +176,7 @@ export default function TicketEvidenceForm() {
           <UploadFilesFormData
             message="Arrastra las imágenes de evidencia aquí (mínimo 1 archivo)"
             onFilesChange={handleEvidenceDrop}
-            type="image"
-            maxFiles={5}
+            type="media"
           />
           {evidenceFiles.length > 0 && (
             <p className="text-sm text-green-600 mt-2">

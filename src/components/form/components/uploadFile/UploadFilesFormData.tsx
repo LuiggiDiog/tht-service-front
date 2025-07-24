@@ -3,7 +3,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import BaseIcon from '@/components/ui/BaseIcon';
 import { useAddToast } from '@/domains/toast';
-import { EMPTY_STRING, IMAGE_FILE_TYPES } from '@/utils/constants';
+import {
+  EMPTY_STRING,
+  IMAGE_FILE_TYPES,
+  MEDIA_FILE_TYPES,
+  VIDEO_FILE_TYPES,
+} from '@/utils/constants';
 
 interface FileItem {
   id: string;
@@ -17,7 +22,7 @@ interface UploadFilesFormDataProps {
   maxFiles?: number;
   maxSizeMB?: number;
   message?: string;
-  type?: 'image' | 'file';
+  type?: 'image' | 'video' | 'media' | 'file';
   showPreviews?: boolean;
   disabled?: boolean;
 }
@@ -25,7 +30,7 @@ interface UploadFilesFormDataProps {
 export const UploadFilesFormData: React.FC<UploadFilesFormDataProps> = ({
   onFilesChange,
   acceptedFileTypes,
-  maxFiles = 5,
+  maxFiles = 3,
   maxSizeMB = 10,
   message,
   type = 'file',
@@ -37,7 +42,14 @@ export const UploadFilesFormData: React.FC<UploadFilesFormDataProps> = ({
   const { warning, error } = useAddToast();
 
   const acceptedTypes =
-    acceptedFileTypes || (type === 'image' ? IMAGE_FILE_TYPES : []);
+    acceptedFileTypes ||
+    (type === 'image'
+      ? IMAGE_FILE_TYPES
+      : type === 'video'
+      ? VIDEO_FILE_TYPES
+      : type === 'media'
+      ? MEDIA_FILE_TYPES
+      : []);
 
   // Validar archivo
   const validateFile = useCallback(
@@ -89,9 +101,12 @@ export const UploadFilesFormData: React.FC<UploadFilesFormDataProps> = ({
             continue;
           }
 
-          // Crear preview si es imagen
+          // Crear preview si es imagen o video
           const preview =
-            type === 'image' && file.type.startsWith('image/')
+            ((type === 'image' || type === 'media') &&
+              file.type.startsWith('image/')) ||
+            ((type === 'video' || type === 'media') &&
+              file.type.startsWith('video/'))
               ? URL.createObjectURL(file)
               : undefined;
 
@@ -232,7 +247,8 @@ export const UploadFilesFormData: React.FC<UploadFilesFormDataProps> = ({
 
           <div
             className={
-              showPreviews && type === 'image'
+              showPreviews &&
+              (type === 'image' || type === 'video' || type === 'media')
                 ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
                 : 'space-y-2'
             }
@@ -241,18 +257,31 @@ export const UploadFilesFormData: React.FC<UploadFilesFormDataProps> = ({
               <div
                 key={fileItem.id}
                 className={
-                  showPreviews && type === 'image'
+                  showPreviews &&
+                  (type === 'image' || type === 'video' || type === 'media')
                     ? 'relative group'
                     : 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg'
                 }
               >
-                {showPreviews && type === 'image' && fileItem.preview ? (
+                {showPreviews &&
+                (type === 'image' || type === 'video' || type === 'media') &&
+                fileItem.preview ? (
                   <div className="relative">
-                    <img
-                      src={fileItem.preview}
-                      alt={fileItem.file.name}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
+                    {fileItem.file.type.startsWith('image/') ? (
+                      <img
+                        src={fileItem.preview}
+                        alt={fileItem.file.name}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                    ) : fileItem.file.type.startsWith('video/') ? (
+                      <video
+                        src={fileItem.preview}
+                        className="w-full h-32 object-cover rounded-lg"
+                        controls={false}
+                        muted
+                        preload="metadata"
+                      />
+                    ) : null}
                     <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center">
                       <button
                         onClick={() => removeFile(fileItem.id)}
