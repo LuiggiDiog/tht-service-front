@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   changeTicketStatus,
+  closeTicket,
   deleteTicket,
   deleteTicketEvidence,
   getPartChanges,
@@ -58,6 +59,16 @@ export function useChangeTicketStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: changeTicketStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY_QUERY_TICKETS] });
+    },
+  });
+}
+
+export function useCloseTicket() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: closeTicket,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [KEY_QUERY_TICKETS] });
     },

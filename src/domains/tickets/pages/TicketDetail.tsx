@@ -2,6 +2,8 @@ import {
   mdiAccount,
   mdiArrowLeft,
   mdiCalendar,
+  mdiCellphone,
+  mdiCreditCard,
   mdiDelete,
   mdiEmail,
   mdiFileImage,
@@ -27,6 +29,16 @@ const getEvidenceTypeLabel = (type: string) => {
     delivery: 'Entrega',
   };
   return types[type as keyof typeof types] || type;
+};
+
+const getPaymentMethodLabel = (method: string) => {
+  const methods = {
+    cash: 'Efectivo',
+    card: 'Tarjeta',
+    transfer: 'Transferencia',
+    check: 'Cheque',
+  };
+  return methods[method as keyof typeof methods] || method;
 };
 
 export default function TicketDetail() {
@@ -183,6 +195,110 @@ export default function TicketDetail() {
         </div>
       </CardBox>
 
+      {/* Información del Dispositivo */}
+      <CardBox className="mb-6">
+        <div className="flex items-center mb-4">
+          <BaseIcon path={mdiCellphone} size={20} className="mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Dispositivo
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Modelo:
+            </span>
+            <p className="text-gray-900 dark:text-gray-100">
+              {ticket.device_model}
+            </p>
+          </div>
+
+          <div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Número de Serie:
+            </span>
+            <p className="text-gray-900 dark:text-gray-100">
+              {ticket.device_serial}
+            </p>
+          </div>
+        </div>
+      </CardBox>
+
+      {/* Información de Pagos */}
+      <CardBox className="mb-6">
+        <div className="flex items-center mb-4">
+          <BaseIcon path={mdiCreditCard} size={20} className="mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Información de Pago
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Monto Total:
+            </span>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              ${parseFloat(ticket.amount).toFixed(2)}
+            </p>
+          </div>
+
+          <div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Método de Pago:
+            </span>
+            <p className="text-gray-900 dark:text-gray-100">
+              {getPaymentMethodLabel(ticket.payment_method)}
+            </p>
+          </div>
+
+          <div>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Primer Pago:
+            </span>
+            <p className="text-gray-900 dark:text-gray-100">
+              ${parseFloat(ticket.payment_first_amount).toFixed(2)}
+            </p>
+          </div>
+
+          {/* Solo mostrar segundo pago si es mayor a 0 */}
+          {ticket.payment_second_amount &&
+            parseFloat(ticket.payment_second_amount) > 0 && (
+              <div>
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Segundo Pago:
+                </span>
+                <p className="text-gray-900 dark:text-gray-100">
+                  ${parseFloat(ticket.payment_second_amount).toFixed(2)}
+                </p>
+              </div>
+            )}
+        </div>
+
+        {/* Mostrar saldo pendiente si hay segundo pago pendiente y el saldo es mayor a 0 */}
+        {(() => {
+          const pendingBalance =
+            parseFloat(ticket.amount) - parseFloat(ticket.payment_first_amount);
+          const hasSecondPaymentPending =
+            ticket.payment_second_amount === null ||
+            parseFloat(ticket.payment_second_amount || '0') === 0;
+
+          return hasSecondPaymentPending && pendingBalance > 0 ? (
+            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <div className="flex items-center">
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  Saldo Pendiente:
+                </span>
+                <span className="ml-2 text-sm font-semibold text-yellow-900 dark:text-yellow-100">
+                  ${pendingBalance.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ) : null;
+        })()}
+      </CardBox>
+
       {/* Evidencias */}
       <CardBox className="mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -192,7 +308,7 @@ export default function TicketDetail() {
               Evidencias ({ticket.evidences?.length || 0})
             </h3>
           </div>
-          
+
           {/* Botón para agregar evidencia - solo disponible en desarrollo */}
           {ticket.status === 'in_progress' && (
             <BaseButton
@@ -208,18 +324,22 @@ export default function TicketDetail() {
 
         {(!ticket.evidences || ticket.evidences.length === 0) && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <BaseIcon path={mdiImageMultiple} size={48} className="mx-auto mb-2 opacity-50" />
+            <BaseIcon
+              path={mdiImageMultiple}
+              size={48}
+              className="mx-auto mb-2 opacity-50"
+            />
             <p>No hay evidencias registradas</p>
             {ticket.status !== 'in_progress' && (
               <p className="text-sm mt-1">
-                Solo se puede agregar evidencia cuando el ticket está en desarrollo
+                Solo se puede agregar evidencia cuando el ticket está en
+                desarrollo
               </p>
             )}
           </div>
         )}
 
         {ticket.evidences && ticket.evidences.length > 0 && (
-
           <div className="space-y-4">
             {ticket.evidences.map((evidence) => (
               <div

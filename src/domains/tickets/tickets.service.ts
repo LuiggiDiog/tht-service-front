@@ -91,6 +91,18 @@ export const getTicketEvidences = async (ticket_id: number) => {
   return resp as TicketEvidenceT[];
 };
 
+export const closeTicket = async (data: TicketT) => {
+  const resp = await apiFetch({
+    url: `${baseURL}/${data.id}/close`,
+    method: 'PUT',
+    body: {
+      status: data.status,
+      payment_second_amount: data.payment_second_amount,
+    },
+  });
+  return resp as TicketT;
+};
+
 export const deleteTicketEvidence = async (evidence_id: number) => {
   const resp = await apiFetch({
     url: `${baseURL}/evidences/${evidence_id}`,
