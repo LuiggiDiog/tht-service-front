@@ -1,4 +1,5 @@
 import {
+  mdiCamera,
   mdiDelete,
   mdiEye,
   mdiFilePlusOutline,
@@ -6,7 +7,11 @@ import {
   mdiPlay,
 } from '@mdi/js';
 import BadgeStatus from '../components/BadgeStatus';
-import { useDeleteTicket, useGetTickets, usePutTicket } from '../tickets.query';
+import {
+  useChangeTicketStatus,
+  useDeleteTicket,
+  useGetTickets,
+} from '../tickets.query';
 import { TicketT } from '../tickets.type';
 import TableCustom, { Columns } from '@/components/tableCustom';
 import BaseActions from '@/components/ui/BaseActions';
@@ -19,7 +24,7 @@ import useConfirmationModal from '@/components/ui/modals/hooks/useConfirmationMo
 export default function TicketList() {
   const { data, isLoading } = useGetTickets();
   const deleteTicket = useDeleteTicket();
-  const putTicket = usePutTicket();
+  const changeTicketStatus = useChangeTicketStatus();
   const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
     useConfirmationDeleteModal();
   const { openModal: openConfirmStateModal, Modal: ConfirmStateModal } =
@@ -91,6 +96,18 @@ export default function TicketList() {
               small
             />
 
+            {/* Botón para agregar evidencia - solo disponible en desarrollo */}
+            {info.status === 'in_progress' && (
+              <BaseButton
+                href={`/tickets/${info.id}/evidence`}
+                color="warning"
+                icon={mdiCamera}
+                label="Evidencia"
+                roundedFull
+                small
+              />
+            )}
+
             {/* Mostrar botón 'Editar' solo si el ticket NO está cerrado */}
             {/* {info.status !== 'closed' && (
               <BaseButton
@@ -112,7 +129,10 @@ export default function TicketList() {
                 onClick={() =>
                   openConfirmStateModal({
                     onConfirm: () => {
-                      putTicket.mutate({ ...info, status: 'in_progress' });
+                      changeTicketStatus.mutate({
+                        ...info,
+                        status: 'in_progress',
+                      });
                     },
                     message:
                       '¿Estás seguro que deseas poner este ticket EN PROGRESO?',

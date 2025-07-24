@@ -91,6 +91,14 @@ export const getTicketEvidences = async (ticket_id: number) => {
   return resp as TicketEvidenceT[];
 };
 
+export const deleteTicketEvidence = async (evidence_id: number) => {
+  const resp = await apiFetch({
+    url: `${baseURL}/evidences/${evidence_id}`,
+    method: 'DELETE',
+  });
+  return resp as TicketEvidenceT;
+};
+
 // Rutas para cambios de piezas
 export const postPartChange = async (data: TicketPartChangeT) => {
   const resp = await apiFetch({

@@ -57,6 +57,7 @@ export type TicketEvidenceT = {
   updated_at: string;
 
   files: File[];
+  media: TicketEvidenceMediaT[];
 };
 
 // Nuevo tipo para evidencia con información completa

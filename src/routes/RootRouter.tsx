@@ -12,7 +12,7 @@ import {
 import { ProductForm, ProductList } from '@/domains/products';
 import { RegisterByItem } from '@/domains/registers';
 import { useSettingStore } from '@/domains/settings';
-import { TicketDetail, TicketForm, TicketList } from '@/domains/tickets';
+import { TicketDetail, TicketForm, TicketList, TicketEvidenceForm } from '@/domains/tickets';
 import TicketCloseForm from '@/domains/tickets/pages/TicketCloseForm';
 import { UserForm, UsersList } from '@/domains/users';
 import { WarehousesList } from '@/domains/warehouses';
@@ -67,6 +67,7 @@ export default function RootRouter() {
             <Route path="/tickets/:id/view" element={<TicketDetail />} />
             <Route path="/tickets/:id" element={<TicketForm />} />
             <Route path="/tickets/:id/close" element={<TicketCloseForm />} />
+            <Route path="/tickets/:id/evidence" element={<TicketEvidenceForm />} />
 
             <Route path="/warehouses" element={<WarehousesList />} />
 

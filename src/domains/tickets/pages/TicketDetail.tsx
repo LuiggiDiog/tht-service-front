@@ -2,6 +2,7 @@ import {
   mdiAccount,
   mdiArrowLeft,
   mdiCalendar,
+  mdiDelete,
   mdiEmail,
   mdiFileImage,
   mdiImageMultiple,
@@ -9,13 +10,14 @@ import {
 } from '@mdi/js';
 import { useNavigate, useParams } from 'react-router';
 import BadgeStatus from '../components/BadgeStatus';
-import { useGetTicket } from '../tickets.query';
+import { useDeleteTicketEvidence, useGetTicket } from '../tickets.query';
 import BaseIcon from '@/components/ui/BaseIcon';
 import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import CardBox from '@/components/ui/cardBox/CardBox';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
+import { useConfirmationDeleteModal } from '@/components/ui/modals';
 
 const getEvidenceTypeLabel = (type: string) => {
   const types = {
@@ -31,6 +33,9 @@ export default function TicketDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: ticket, isLoading, error } = useGetTicket(id);
+  const deleteTicketEvidence = useDeleteTicketEvidence();
+  const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
+    useConfirmationDeleteModal();
 
   if (isLoading) {
     return <LoadingSection />;
@@ -179,14 +184,41 @@ export default function TicketDetail() {
       </CardBox>
 
       {/* Evidencias */}
-      {ticket.evidences && ticket.evidences.length > 0 && (
-        <CardBox className="mb-6">
-          <div className="flex items-center mb-4">
+      <CardBox className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
             <BaseIcon path={mdiImageMultiple} size={20} className="mr-2" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Evidencias ({ticket.evidences.length})
+              Evidencias ({ticket.evidences?.length || 0})
             </h3>
           </div>
+          
+          {/* Botón para agregar evidencia - solo disponible en desarrollo */}
+          {ticket.status === 'in_progress' && (
+            <BaseButton
+              href={`/tickets/${ticket.id}/evidence`}
+              color="warning"
+              icon={mdiImageMultiple}
+              label="Agregar Evidencia"
+              roundedFull
+              small
+            />
+          )}
+        </div>
+
+        {(!ticket.evidences || ticket.evidences.length === 0) && (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <BaseIcon path={mdiImageMultiple} size={48} className="mx-auto mb-2 opacity-50" />
+            <p>No hay evidencias registradas</p>
+            {ticket.status !== 'in_progress' && (
+              <p className="text-sm mt-1">
+                Solo se puede agregar evidencia cuando el ticket está en desarrollo
+              </p>
+            )}
+          </div>
+        )}
+
+        {ticket.evidences && ticket.evidences.length > 0 && (
 
           <div className="space-y-4">
             {ticket.evidences.map((evidence) => (
@@ -195,12 +227,33 @@ export default function TicketDetail() {
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                    {getEvidenceTypeLabel(evidence.type)}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(evidence.created_at).toLocaleDateString('es-ES')}
-                  </span>
+                  <div className="flex items-center space-x-3">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {getEvidenceTypeLabel(evidence.type)}
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(evidence.created_at).toLocaleDateString(
+                        'es-ES'
+                      )}
+                    </span>
+                  </div>
+                  {/* Solo mostrar botón eliminar si el ticket NO está cerrado */}
+                  {ticket.status !== 'closed' && (
+                    <BaseButton
+                      color="danger"
+                      icon={mdiDelete}
+                      label="Eliminar"
+                      onClick={() =>
+                        confirmationOpenModal({
+                          onConfirm: () => {
+                            deleteTicketEvidence.mutate(evidence.id);
+                          },
+                        })
+                      }
+                      roundedFull
+                      small
+                    />
+                  )}
                 </div>
 
                 {evidence.comment && (
@@ -239,8 +292,8 @@ export default function TicketDetail() {
               </div>
             ))}
           </div>
-        </CardBox>
-      )}
+        )}
+      </CardBox>
 
       {/* Cambios de Piezas */}
       {ticket.part_changes && ticket.part_changes.length > 0 && (
@@ -283,6 +336,7 @@ export default function TicketDetail() {
           </div>
         </CardBox>
       )}
+      <ConfirmationModal />
     </SectionCustom>
   );
 }

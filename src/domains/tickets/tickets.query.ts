@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   changeTicketStatus,
   deleteTicket,
+  deleteTicketEvidence,
   getPartChanges,
   getTicket,
   getTicketEvidences,
@@ -88,6 +89,16 @@ export function useGetTicketEvidences(ticket_id: number) {
   return useQuery({
     queryKey: [KEY_QUERY_TICKETS, ticket_id, 'evidences'],
     queryFn: () => getTicketEvidences(ticket_id),
+  });
+}
+
+export function useDeleteTicketEvidence() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTicketEvidence,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY_QUERY_TICKETS] });
+    },
   });
 }
 
