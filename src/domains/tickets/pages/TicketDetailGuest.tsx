@@ -1,29 +1,21 @@
 import {
   mdiAccount,
-  mdiArrowLeft,
   mdiCalendar,
   mdiCellphone,
-  mdiContentCopy,
   mdiCreditCard,
-  mdiDelete,
   mdiEmail,
-  mdiFileImage,
   mdiImageMultiple,
-  mdiLink,
   mdiPhone,
 } from '@mdi/js';
 import { useNavigate, useParams } from 'react-router';
 import BadgeStatus from '../components/BadgeStatus';
-import { useDeleteTicketEvidence, useGetTicket } from '../tickets.query';
+import { useGetTicketPublic } from '../tickets.query';
 import BaseIcon from '@/components/ui/BaseIcon';
 import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import CardBox from '@/components/ui/cardBox/CardBox';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
-import { useConfirmationDeleteModal } from '@/components/ui/modals';
-import { APP_URL } from '@/config';
-import { useAddToast } from '@/domains/toast';
 
 const getEvidenceTypeLabel = (type: string) => {
   const types = {
@@ -45,14 +37,10 @@ const getPaymentMethodLabel = (method: string) => {
   return methods[method as keyof typeof methods] || method;
 };
 
-export default function TicketDetail() {
-  const { id } = useParams();
+export default function TicketDetailGuest() {
+  const { public_id } = useParams();
   const navigate = useNavigate();
-  const { data: ticket, isLoading, error } = useGetTicket(id);
-  const deleteTicketEvidence = useDeleteTicketEvidence();
-  const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
-    useConfirmationDeleteModal();
-  const { success } = useAddToast();
+  const { data: ticket, isLoading, error } = useGetTicketPublic(public_id);
 
   if (isLoading) {
     return <LoadingSection />;
@@ -64,8 +52,8 @@ export default function TicketDetail() {
         <div className="text-center py-8">
           <p className="text-red-500">Error al cargar el ticket</p>
           <BaseButton
-            onClick={() => navigate('/tickets')}
-            label="Volver a la lista"
+            onClick={() => navigate('/')}
+            label="Volver al inicio"
             color="info"
             className="mt-4"
           />
@@ -74,38 +62,9 @@ export default function TicketDetail() {
     );
   }
 
-  const handleCopyPublicLink = () => {
-    if (ticket.public_id) {
-      const publicLink = `${APP_URL}/tickets-info/${ticket.public_id}`;
-      navigator.clipboard
-        .writeText(publicLink)
-        .then(() => {
-          success('Enlace público copiado al portapapeles');
-        })
-        .catch(() => {
-          // Fallback para navegadores que no soportan clipboard API
-          const textArea = document.createElement('textarea');
-          textArea.value = publicLink;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-          success('Enlace público copiado al portapapeles');
-        });
-    }
-  };
-
   return (
     <SectionCustom>
-      <SectionTitleLineWithButton main title={`Ticket #${ticket.id}`}>
-        <BaseButton
-          onClick={() => navigate('/tickets')}
-          icon={mdiArrowLeft}
-          label="Volver"
-          color="info"
-          roundedFull
-        />
-      </SectionTitleLineWithButton>
+      <SectionTitleLineWithButton main title={`Ticket #${ticket.id}`} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Información General del Ticket */}
@@ -142,36 +101,6 @@ export default function TicketDetail() {
                 {new Date(ticket.updated_at).toLocaleDateString('es-ES')}
               </span>
             </div>
-
-            {/* Enlace público para el cliente */}
-            {ticket.public_id && (
-              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <BaseIcon
-                      path={mdiLink}
-                      size={16}
-                      className="mr-2 text-gray-500"
-                    />
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Enlace público:
-                    </span>
-                  </div>
-                  <BaseButton
-                    onClick={handleCopyPublicLink}
-                    icon={mdiContentCopy}
-                    label="Copiar"
-                    color="info"
-                    roundedFull
-                    small
-                  />
-                </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Comparte este enlace con el cliente para que pueda ver el
-                  progreso
-                </p>
-              </div>
-            )}
           </div>
         </CardBox>
 
@@ -355,27 +284,13 @@ export default function TicketDetail() {
         })()}
       </CardBox>
 
-      {/* Evidencias */}
+      {/* Evidencias - Solo lectura */}
       <CardBox className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <BaseIcon path={mdiImageMultiple} size={20} className="mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Evidencias ({ticket.evidences?.length || 0})
-            </h3>
-          </div>
-
-          {/* Botón para agregar evidencia - solo disponible en desarrollo */}
-          {ticket.status === 'in_progress' && (
-            <BaseButton
-              href={`/tickets/${ticket.id}/evidence`}
-              color="warning"
-              icon={mdiImageMultiple}
-              label="Agregar Evidencia"
-              roundedFull
-              small
-            />
-          )}
+        <div className="flex items-center mb-4">
+          <BaseIcon path={mdiImageMultiple} size={20} className="mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Evidencias ({ticket.evidences?.length || 0})
+          </h3>
         </div>
 
         {(!ticket.evidences || ticket.evidences.length === 0) && (
@@ -386,12 +301,6 @@ export default function TicketDetail() {
               className="mx-auto mb-2 opacity-50"
             />
             <p>No hay evidencias registradas</p>
-            {ticket.status !== 'in_progress' && (
-              <p className="text-sm mt-1">
-                Solo se puede agregar evidencia cuando el ticket está en
-                desarrollo
-              </p>
-            )}
           </div>
         )}
 
@@ -402,34 +311,13 @@ export default function TicketDetail() {
                 key={evidence.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      {getEvidenceTypeLabel(evidence.type)}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(evidence.created_at).toLocaleDateString(
-                        'es-ES'
-                      )}
-                    </span>
-                  </div>
-                  {/* Solo mostrar botón eliminar si el ticket NO está cerrado */}
-                  {ticket.status !== 'closed' && (
-                    <BaseButton
-                      color="danger"
-                      icon={mdiDelete}
-                      label="Eliminar"
-                      onClick={() =>
-                        confirmationOpenModal({
-                          onConfirm: () => {
-                            deleteTicketEvidence.mutate(evidence.id);
-                          },
-                        })
-                      }
-                      roundedFull
-                      small
-                    />
-                  )}
+                <div className="flex items-center space-x-3 mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {getEvidenceTypeLabel(evidence.type)}
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(evidence.created_at).toLocaleDateString('es-ES')}
+                  </span>
                 </div>
 
                 {evidence.comment && (
@@ -464,7 +352,7 @@ export default function TicketDetail() {
                             onClick={() => window.open(media.url, '_blank')}
                           >
                             <BaseIcon
-                              path={mdiFileImage}
+                              path={mdiImageMultiple}
                               size={32}
                               className="text-gray-500"
                             />
@@ -521,7 +409,6 @@ export default function TicketDetail() {
           </div>
         </CardBox>
       )}
-      <ConfirmationModal />
     </SectionCustom>
   );
 }

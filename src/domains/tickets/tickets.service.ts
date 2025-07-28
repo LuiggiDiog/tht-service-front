@@ -127,3 +127,12 @@ export const getPartChanges = async (ticket_id: number) => {
   });
   return resp as TicketPartChangeT[];
 };
+
+const baseURLPublic = `/tickets-public`;
+
+export const getTicketPublic = async (public_id: string) => {
+  const resp = await apiFetch({
+    url: `${baseURLPublic}/${public_id}`,
+  });
+  return resp as TicketDetailT;
+};

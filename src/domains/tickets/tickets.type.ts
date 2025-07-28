@@ -38,6 +38,7 @@ export type TicketDetailT = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  public_id?: string;
   customer: CustomerT;
   technician: UserT;
   evidences: TicketEvidenceT[];

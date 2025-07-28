@@ -7,6 +7,7 @@ import {
   getPartChanges,
   getTicket,
   getTicketEvidences,
+  getTicketPublic,
   getTickets,
   postPartChange,
   postTicket,
@@ -128,5 +129,15 @@ export function useGetPartChanges(ticket_id: number) {
   return useQuery({
     queryKey: [KEY_QUERY_TICKETS, ticket_id, 'part-changes'],
     queryFn: () => getPartChanges(ticket_id),
+  });
+}
+
+// Para tickets públicos
+export function useGetTicketPublic(public_id: string | undefined) {
+  const publicIdValue = String(public_id);
+  return useQuery({
+    queryKey: [KEY_QUERY_TICKETS, 'public', public_id],
+    queryFn: () => getTicketPublic(publicIdValue),
+    enabled: !!public_id,
   });
 }

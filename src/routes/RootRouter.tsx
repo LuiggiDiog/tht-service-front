@@ -12,12 +12,19 @@ import {
 import { ProductForm, ProductList } from '@/domains/products';
 import { RegisterByItem } from '@/domains/registers';
 import { useSettingStore } from '@/domains/settings';
-import { TicketDetail, TicketForm, TicketList, TicketEvidenceForm } from '@/domains/tickets';
+import {
+  TicketDetail,
+  TicketDetailGuest,
+  TicketEvidenceForm,
+  TicketForm,
+  TicketList,
+} from '@/domains/tickets';
 import TicketCloseForm from '@/domains/tickets/pages/TicketCloseForm';
 import { UserForm, UsersList } from '@/domains/users';
 import { WarehousesList } from '@/domains/warehouses';
 import Authenticated from '@/layouts/authenticatedLayout';
 import Base from '@/layouts/baseLayout';
+import GuestContainerLayout from '@/layouts/guestContainerLayout';
 import Guest from '@/layouts/guestLayout';
 import Dashboard from '@/pages/Dashboard';
 
@@ -34,14 +41,12 @@ export default function RootRouter() {
           <Route element={<Guest />}>
             <Route path="/" element={<Login title={titleLogin} />} />
             <Route path="login" element={<Login title={titleLogin} />} />
+          </Route>
 
+          <Route element={<GuestContainerLayout isDarkMode={darkMode} />}>
             <Route
-              path="/rastreo-lotes"
-              element={<LotsReport isGuestBasic />}
-            />
-            <Route
-              path="/register/by-item/:id"
-              element={<RegisterByItem isGuestBasic />}
+              path="/tickets-info/:public_id"
+              element={<TicketDetailGuest />}
             />
           </Route>
 
@@ -67,7 +72,10 @@ export default function RootRouter() {
             <Route path="/tickets/:id/view" element={<TicketDetail />} />
             <Route path="/tickets/:id" element={<TicketForm />} />
             <Route path="/tickets/:id/close" element={<TicketCloseForm />} />
-            <Route path="/tickets/:id/evidence" element={<TicketEvidenceForm />} />
+            <Route
+              path="/tickets/:id/evidence"
+              element={<TicketEvidenceForm />}
+            />
 
             <Route path="/warehouses" element={<WarehousesList />} />
 
