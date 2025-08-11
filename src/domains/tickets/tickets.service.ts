@@ -13,7 +13,7 @@ export const getTickets = async () => {
   const resp = await apiFetch({
     url: baseURL,
   });
-  return resp as TicketT[];
+  return resp as TicketDetailT[];
 };
 
 export const getTicket = async (id: number) => {

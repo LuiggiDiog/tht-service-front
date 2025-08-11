@@ -12,7 +12,7 @@ import {
   useDeleteTicket,
   useGetTickets,
 } from '../tickets.query';
-import { TicketT } from '../tickets.type';
+import { TicketDetailT } from '../tickets.type';
 import TableCustom, { Columns } from '@/components/tableCustom';
 import BaseActions from '@/components/ui/BaseActions';
 import SectionCustom from '@/components/ui/SectionCustom';
@@ -20,6 +20,8 @@ import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButt
 import BaseButton from '@/components/ui/baseButton';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
 import useConfirmationModal from '@/components/ui/modals/hooks/useConfirmationModal';
+import { CustomerNameDisplay } from '@/domains/customers';
+import { UserNameDisplay } from '@/domains/users';
 
 export default function TicketList() {
   const { data, isLoading } = useGetTickets();
@@ -36,18 +38,18 @@ export default function TicketList() {
       accessorKey: 'id',
     },
     {
-      header: 'Cliente ID',
+      header: 'Cliente',
       accessorKey: 'customer_id',
-    },
-    {
-      header: 'Técnico ID',
-      accessorKey: 'technician_id',
+      cell: ({ row }) => {
+        const info = row.original as TicketDetailT;
+        return <CustomerNameDisplay customer={info.customer} />;
+      },
     },
     {
       header: 'Descripción',
       accessorKey: 'description',
       cell: ({ row }) => {
-        const info = row.original as TicketT;
+        const info = row.original as TicketDetailT;
         return (
           <div className="max-w-xs">
             <p className="text-sm text-gray-900 dark:text-gray-100 truncate">
@@ -61,15 +63,23 @@ export default function TicketList() {
       header: 'Estado',
       accessorKey: 'status',
       cell: ({ row }) => {
-        const info = row.original as TicketT;
+        const info = row.original as TicketDetailT;
         return <BadgeStatus status={info.status} />;
+      },
+    },
+    {
+      header: 'Ingresado por',
+      accessorKey: 'created_by',
+      cell: ({ row }) => {
+        const info = row.original as TicketDetailT;
+        return <UserNameDisplay user={info.created_by_user} />;
       },
     },
     {
       header: 'Fecha Creación',
       accessorKey: 'created_at',
       cell: ({ row }) => {
-        const info = row.original as TicketT;
+        const info = row.original as TicketDetailT;
         return new Date(info.created_at).toLocaleDateString('es-ES');
       },
     },
@@ -77,14 +87,14 @@ export default function TicketList() {
       header: 'Última Actualización',
       accessorKey: 'updated_at',
       cell: ({ row }) => {
-        const info = row.original as TicketT;
+        const info = row.original as TicketDetailT;
         return new Date(info.updated_at).toLocaleDateString('es-ES');
       },
     },
     {
       header: 'Acciones',
       cell: ({ row }) => {
-        const info = row.original as TicketT;
+        const info = row.original as TicketDetailT;
         return (
           <BaseActions>
             <BaseButton
@@ -130,8 +140,24 @@ export default function TicketList() {
                   openConfirmStateModal({
                     onConfirm: () => {
                       changeTicketStatus.mutate({
-                        ...info,
+                        id: parseInt(info.id),
+                        customer_id: parseInt(info.customer_id),
+                        technician_id: parseInt(info.technician_id),
+                        device_model: info.device_model,
+                        device_serial: info.device_serial,
+                        description: info.description,
+                        amount: parseFloat(info.amount),
+                        payment_method: info.payment_method,
+                        payment_first_amount: parseFloat(
+                          info.payment_first_amount
+                        ),
+                        payment_second_amount: info.payment_second_amount
+                          ? parseFloat(info.payment_second_amount)
+                          : undefined,
                         status: 'in_progress',
+                        created_by: parseInt(info.created_by),
+                        created_at: info.created_at,
+                        updated_at: info.updated_at,
                       });
                     },
                     message:
@@ -166,7 +192,7 @@ export default function TicketList() {
               onClick={() =>
                 confirmationOpenModal({
                   onConfirm: () => {
-                    deleteTicket.mutate(info.id);
+                    deleteTicket.mutate(parseInt(info.id));
                   },
                 })
               }

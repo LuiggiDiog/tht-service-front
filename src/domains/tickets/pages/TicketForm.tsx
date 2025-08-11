@@ -2,7 +2,7 @@ import { mdiTableBorder } from '@mdi/js';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
-import { useUserOptions } from '../hooks/useUserOptions';
+
 import {
   useGetTicket,
   usePostTicket,
@@ -36,7 +36,6 @@ export default function TicketForm() {
 
   const { id } = useParams();
   const { data, isLoading } = useGetTicket(id);
-  const { userOptions } = useUserOptions();
   const { customerOptions } = useCustomerOptions();
   const { paymentMethodOptions } = usePaymentMethodOptions();
 
@@ -45,7 +44,6 @@ export default function TicketForm() {
 
   const schema = Yup.object().shape({
     customer_id: Yup.number().required('Requerido'),
-    technician_id: Yup.number().required('Requerido'),
     device_model: Yup.string().required('Requerido'),
     device_serial: Yup.string().required('Requerido'),
     description: Yup.string()
@@ -134,15 +132,6 @@ export default function TicketForm() {
         />
       </FormField>
 
-      <FormField label="Técnico">
-        <Field
-          name="technician_id"
-          component={SelectField}
-          options={userOptions}
-          placeholder="Selecciona un técnico"
-        />
-      </FormField>
-
       <FormField label="Modelo de dispositivo">
         <Field
           name="device_model"
@@ -167,27 +156,33 @@ export default function TicketForm() {
         />
       </FormField>
 
-      <FormField label="Precio">
+      <FormField label="Precio del servicio">
         <Field
           name="amount"
-          label="Precio"
-          placeholder="Precio"
+          label="Precio del servicio"
+          placeholder="Precio del servicio"
           type="number"
           step={0.01}
         />
       </FormField>
 
-      <FormField label="Método de pago">
+      <FormField label="Método de abono">
         <Field
           name="payment_method"
           component={SelectField}
           options={paymentMethodOptions}
-          placeholder="Selecciona un método de pago"
+          placeholder="Selecciona un método de abono"
         />
       </FormField>
 
-      <FormField label="Pago">
-        <Field name="payment_first_amount" label="Pago" placeholder="Pago" />
+      <FormField label="Abono">
+        <Field
+          name="payment_first_amount"
+          label="Abono"
+          placeholder="Abono"
+          type="number"
+          step={0.01}
+        />
       </FormField>
 
       <FormField label="Estado">
