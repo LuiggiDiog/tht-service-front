@@ -2,9 +2,11 @@ import {
   mdiAccount,
   mdiCalendar,
   mdiCellphone,
+  mdiContentCopy,
   mdiCreditCard,
   mdiEmail,
   mdiImageMultiple,
+  mdiLink,
   mdiPhone,
 } from '@mdi/js';
 import {
@@ -13,8 +15,10 @@ import {
   TicketEvidenceT,
   TicketPartChangeT,
 } from '../tickets.type';
+import BadgeStatus from './BadgeStatus';
 import BaseIcon from '@/components/ui/BaseIcon';
 import CardBox from '@/components/ui/cardBox/CardBox';
+import { CustomerNameDisplay } from '@/domains/customers';
 
 const getEvidenceTypeLabel = (type: string) => {
   const types = {
@@ -36,18 +40,21 @@ const getPaymentMethodLabel = (method: string) => {
   return methods[method as keyof typeof methods] || method;
 };
 
-export const TicketGeneralInfo = ({ ticket }: { ticket: TicketDetailT }) => (
+export const TicketGeneralInfo = ({
+  ticket,
+  onCopyPublicLink,
+  showPublicLink = false,
+}: {
+  ticket: TicketDetailT;
+  onCopyPublicLink?: () => void;
+  showPublicLink?: boolean;
+}) => (
   <CardBox>
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
         Información del Ticket
       </h3>
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-        {ticket.status === 'pending' && 'Pendiente'}
-        {ticket.status === 'in_progress' && 'En Desarrollo'}
-        {ticket.status === 'completed' && 'Completado'}
-        {ticket.status === 'closed' && 'Cerrado'}
-      </span>
+      <BadgeStatus status={ticket.status} />
     </div>
 
     <div className="space-y-3">
@@ -73,6 +80,34 @@ export const TicketGeneralInfo = ({ ticket }: { ticket: TicketDetailT }) => (
           Actualizado: {new Date(ticket.updated_at).toLocaleDateString('es-ES')}
         </span>
       </div>
+
+      {/* Enlace público para el cliente */}
+      {showPublicLink && ticket.public_id && onCopyPublicLink && (
+        <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <BaseIcon
+                path={mdiLink}
+                size={16}
+                className="mr-2 text-gray-500"
+              />
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Enlace público:
+              </span>
+            </div>
+            <button
+              onClick={onCopyPublicLink}
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <BaseIcon path={mdiContentCopy} size={16} className="mr-2" />
+              Copiar
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            Comparte este enlace con el cliente para que pueda ver el progreso
+          </p>
+        </div>
+      )}
     </div>
   </CardBox>
 );
@@ -92,7 +127,7 @@ export const TicketCustomerInfo = ({ ticket }: { ticket: TicketDetailT }) => (
           Nombre:
         </span>
         <p className="text-gray-900 dark:text-gray-100">
-          {ticket.customer.name}
+          <CustomerNameDisplay customer={ticket.customer} />
         </p>
       </div>
 

@@ -16,6 +16,7 @@ import Form, {
   SelectField,
   ValuesFormT,
 } from '@/components/form';
+import MoneyField from '@/components/form/components/MoneyField';
 import { UploadFilesFormData } from '@/components/form/components/uploadFile';
 import BaseDivider from '@/components/ui/BaseDivider';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
@@ -157,13 +158,7 @@ export default function TicketForm() {
       </FormField>
 
       <FormField label="Precio del servicio">
-        <Field
-          name="amount"
-          label="Precio del servicio"
-          placeholder="Precio del servicio"
-          type="number"
-          step={0.01}
-        />
+        <Field name="amount" component={MoneyField} />
       </FormField>
 
       <FormField label="Método de abono">
@@ -176,13 +171,7 @@ export default function TicketForm() {
       </FormField>
 
       <FormField label="Abono">
-        <Field
-          name="payment_first_amount"
-          label="Abono"
-          placeholder="Abono"
-          type="number"
-          step={0.01}
-        />
+        <Field name="payment_first_amount" component={MoneyField} />
       </FormField>
 
       <FormField label="Estado">

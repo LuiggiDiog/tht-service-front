@@ -15,6 +15,8 @@ import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButt
 import BaseButton from '@/components/ui/baseButton';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
+import { APP_URL } from '@/config';
+import { useAddToast } from '@/domains/toast';
 
 export default function TicketDetail() {
   const { id } = useParams();
@@ -23,6 +25,7 @@ export default function TicketDetail() {
   const deleteTicketEvidence = useDeleteTicketEvidence();
   const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
     useConfirmationDeleteModal();
+  const { success } = useAddToast();
 
   if (isLoading) {
     return <LoadingSection />;
@@ -43,6 +46,27 @@ export default function TicketDetail() {
       </SectionCustom>
     );
   }
+
+  const handleCopyPublicLink = () => {
+    if (ticket.public_id) {
+      const publicLink = `${APP_URL}/tickets-info/${ticket.public_id}`;
+      navigator.clipboard
+        .writeText(publicLink)
+        .then(() => {
+          success('Enlace público copiado al portapapeles');
+        })
+        .catch(() => {
+          // Fallback para navegadores que no soportan clipboard API
+          const textArea = document.createElement('textarea');
+          textArea.value = publicLink;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          success('Enlace público copiado al portapapeles');
+        });
+    }
+  };
 
   const handleDeleteEvidence = (evidenceId: number) => {
     confirmationOpenModal({
@@ -66,14 +90,18 @@ export default function TicketDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Información General del Ticket */}
-        <TicketGeneralInfo ticket={ticket} />
+        <TicketGeneralInfo
+          ticket={ticket}
+          onCopyPublicLink={handleCopyPublicLink}
+          showPublicLink={true}
+        />
 
         {/* Información del Cliente */}
         <TicketCustomerInfo ticket={ticket} />
       </div>
 
-      {/* Información del Técnico */}
-      <TicketUserInfo ticket={ticket} isGuest={false} />
+      {/* Información del Usuario que Ingresó el Ticket */}
+      <TicketUserInfo ticket={ticket} isGuest={true} />
 
       {/* Información del Dispositivo */}
       <TicketDeviceInfo ticket={ticket} />
