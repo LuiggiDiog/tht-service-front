@@ -18,6 +18,7 @@ import {
   TicketEvidenceForm,
   TicketForm,
   TicketList,
+  TicketEdit,
 } from '@/domains/tickets';
 import TicketCloseForm from '@/domains/tickets/pages/TicketCloseForm';
 import { UserForm, UsersList } from '@/domains/users';
@@ -76,6 +77,7 @@ export default function RootRouter() {
               path="/tickets/:id/evidence"
               element={<TicketEvidenceForm />}
             />
+            <Route path="/tickets/:id/edit" element={<TicketEdit />} />
 
             <Route path="/warehouses" element={<WarehousesList />} />
 

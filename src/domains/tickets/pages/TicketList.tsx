@@ -118,17 +118,17 @@ export default function TicketList() {
               />
             )}
 
-            {/* Mostrar botón 'Editar' solo si el ticket NO está cerrado */}
-            {/* {info.status !== 'closed' && (
+            {/* Botón para editar ticket - solo disponible si NO está cerrado */}
+            {info.status !== 'closed' && (
               <BaseButton
-                href={`/tickets/${info.id}`}
-                color="warning"
+                href={`/tickets/${info.id}/edit`}
+                color="success"
                 icon={mdiPencil}
                 label="Editar"
                 roundedFull
                 small
               />
-            )} */}
+            )}
 
             {/* Mostrar botón 'En Progreso' solo si el ticket NO está en progreso ni cerrado */}
             {info.status !== 'in_progress' && info.status !== 'closed' && (

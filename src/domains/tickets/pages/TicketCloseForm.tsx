@@ -14,6 +14,7 @@ import Form, {
   SelectField,
   ValuesFormT,
 } from '@/components/form';
+import MoneyField from '@/components/form/components/MoneyField';
 import { UploadFilesFormData } from '@/components/form/components/uploadFile';
 import BaseDivider from '@/components/ui/BaseDivider';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
@@ -28,7 +29,7 @@ export default function TicketCloseForm() {
   const navigate = useNavigate();
   const closeTicket = useCloseTicket();
   const postTicketEvidence = usePostTicketEvidence();
-  const { success } = useAddToast();
+  const { success, error } = useAddToast();
 
   const { id } = useParams();
   const { data, isLoading } = useGetTicket(id);
@@ -64,6 +65,12 @@ export default function TicketCloseForm() {
     try {
       setIsLoadingGeneral(true);
       if (!id) throw new Error('ID de ticket no encontrado');
+
+      // Validar que haya al menos un archivo de evidencia
+      if (evidenceFiles.length === 0) {
+        error('Debe subir al menos un archivo de evidencia');
+        return;
+      }
 
       // Preparar datos del ticket para cerrar
       const ticketUpdate: Partial<TicketT> = {
@@ -165,24 +172,18 @@ export default function TicketCloseForm() {
               Valor Pendiente: ${pendingAmount.toFixed(2)}
             </span>
           </div>
-          <FormField label="Segundo Pago (Opcional)">
-            <Field
-              name="payment_second_amount"
-              label="Segundo Pago"
-              placeholder={`Máximo: $${pendingAmount.toFixed(2)}`}
-              type="number"
-              step="0.01"
-            />
+          <FormField label="Segundo Pago">
+            <Field name="payment_second_amount" component={MoneyField} />
           </FormField>
         </div>
       )}
 
       <div className="w-full pb-4 md:mb-0">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Archivos de Evidencia
+          Archivos de Evidencia *
         </label>
         <UploadFilesFormData
-          message="Arrastra las imágenes de evidencia aquí"
+          message="Arrastra las imágenes de evidencia aquí (mínimo 1 archivo)"
           onFilesChange={handleEvidenceDrop}
           type="media"
         />

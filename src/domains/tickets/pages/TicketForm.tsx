@@ -33,7 +33,7 @@ export default function TicketForm() {
   const postTicket = usePostTicket();
   const putTicket = usePutTicket();
   const postTicketEvidence = usePostTicketEvidence();
-  const { success } = useAddToast();
+  const { success, error } = useAddToast();
 
   const { id } = useParams();
   const { data, isLoading } = useGetTicket(id);
@@ -63,6 +63,12 @@ export default function TicketForm() {
   const submit = async (values: ValuesFormT) => {
     try {
       setIsLoadingGeneral(true);
+
+      // Validar que haya al menos un archivo de evidencia
+      if (evidenceFiles.length === 0) {
+        error('Debe subir al menos un archivo de evidencia');
+        return;
+      }
 
       const json = values as TicketT;
       json.id = parseInt(id as string);
@@ -206,10 +212,10 @@ export default function TicketForm() {
 
       <div className="w-full pb-4 md:mb-0">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Archivos de Evidencia
+          Archivos de Evidencia *
         </label>
         <UploadFilesFormData
-          message="Arrastra las imágenes de evidencia aquí"
+          message="Arrastra las imágenes de evidencia aquí (mínimo 1 archivo)"
           onFilesChange={handleEvidenceDrop}
           type="media"
         />

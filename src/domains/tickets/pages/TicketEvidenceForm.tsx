@@ -178,11 +178,6 @@ export default function TicketEvidenceForm() {
             onFilesChange={handleEvidenceDrop}
             type="media"
           />
-          {evidenceFiles.length > 0 && (
-            <p className="text-sm text-green-600 mt-2">
-              {evidenceFiles.length} archivo(s) seleccionado(s)
-            </p>
-          )}
         </div>
 
         <div className="flex justify-end space-x-4 pt-6">
