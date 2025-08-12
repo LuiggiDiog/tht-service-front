@@ -1,20 +1,12 @@
-import {
-  mdiCamera,
-  mdiDelete,
-  mdiEye,
-  mdiFilePlusOutline,
-  mdiPencil,
-  mdiPlay,
-} from '@mdi/js';
-import BadgeStatus from '../components/BadgeStatus';
+import { mdiFilePlusOutline } from '@mdi/js';
+import { BadgeStatus, TicketActionsDropdown } from '../components';
 import {
   useChangeTicketStatus,
   useDeleteTicket,
   useGetTickets,
 } from '../tickets.query';
-import { TicketDetailT } from '../tickets.type';
+import { TicketDetailT, TicketT } from '../tickets.type';
 import TableCustom, { Columns } from '@/components/tableCustom';
-import BaseActions from '@/components/ui/BaseActions';
 import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
@@ -96,110 +88,33 @@ export default function TicketList() {
       cell: ({ row }) => {
         const info = row.original as TicketDetailT;
         return (
-          <BaseActions>
-            <BaseButton
-              href={`/tickets/${info.id}/view`}
-              color="info"
-              icon={mdiEye}
-              label="Ver"
-              roundedFull
-              small
-            />
-
-            {/* Botón para agregar evidencia - solo disponible en desarrollo */}
-            {info.status === 'in_progress' && (
-              <BaseButton
-                href={`/tickets/${info.id}/evidence`}
-                color="warning"
-                icon={mdiCamera}
-                label="Evidencia"
-                roundedFull
-                small
-              />
-            )}
-
-            {/* Botón para editar ticket - solo disponible si NO está cerrado */}
-            {info.status !== 'closed' && (
-              <BaseButton
-                href={`/tickets/${info.id}/edit`}
-                color="success"
-                icon={mdiPencil}
-                label="Editar"
-                roundedFull
-                small
-              />
-            )}
-
-            {/* Mostrar botón 'En Progreso' solo si el ticket NO está en progreso ni cerrado */}
-            {info.status !== 'in_progress' && info.status !== 'closed' && (
-              <BaseButton
-                color="success"
-                icon={mdiPlay}
-                label="En Progreso"
-                onClick={() =>
-                  openConfirmStateModal({
-                    onConfirm: () => {
-                      changeTicketStatus.mutate({
-                        id: parseInt(info.id),
-                        customer_id: parseInt(info.customer_id),
-                        technician_id: parseInt(info.technician_id),
-                        device_model: info.device_model,
-                        device_serial: info.device_serial,
-                        description: info.description,
-                        amount: parseFloat(info.amount),
-                        payment_method: info.payment_method,
-                        payment_first_amount: parseFloat(
-                          info.payment_first_amount
-                        ),
-                        payment_second_amount: info.payment_second_amount
-                          ? parseFloat(info.payment_second_amount)
-                          : undefined,
-                        status: 'in_progress',
-                        created_by: parseInt(info.created_by),
-                        created_at: info.created_at,
-                        updated_at: info.updated_at,
-                      });
-                    },
-                    message:
-                      '¿Estás seguro que deseas poner este ticket EN PROGRESO?',
-                    title: 'Confirmar cambio de estado',
-                    buttonColor: 'success',
-                    buttonLabel: 'Sí, poner en progreso',
-                    buttonCancelLabel: 'Cancelar',
-                  })
-                }
-                roundedFull
-                small
-              />
-            )}
-
-            {/* Mostrar botón 'Cerrar Ticket' solo si el ticket está en progreso */}
-            {info.status === 'in_progress' && (
-              <BaseButton
-                color="info"
-                icon={mdiPencil}
-                label="Cerrar Ticket"
-                href={`/tickets/${info.id}/close`}
-                roundedFull
-                small
-              />
-            )}
-
-            <BaseButton
-              color="danger"
-              icon={mdiDelete}
-              label="Eliminar"
-              onClick={() =>
-                confirmationOpenModal({
-                  onConfirm: () => {
-                    deleteTicket.mutate(parseInt(info.id));
-                  },
-                })
-              }
-              roundedFull
-              small
-            />
-          </BaseActions>
+          <TicketActionsDropdown
+            ticket={info}
+            onDeleteClick={() =>
+              confirmationOpenModal({
+                onConfirm: () => {
+                  deleteTicket.mutate(parseInt(info.id));
+                },
+              })
+            }
+            onStatusChange={() =>
+              openConfirmStateModal({
+                onConfirm: () => {
+                  const json = {
+                    id: parseInt(info.id),
+                    status: 'in_progress',
+                  } as TicketT;
+                  changeTicketStatus.mutate(json);
+                },
+                message:
+                  '¿Estás seguro que deseas poner este ticket EN PROGRESO?',
+                title: 'Confirmar cambio de estado',
+                buttonColor: 'success',
+                buttonLabel: 'Sí, poner en progreso',
+                buttonCancelLabel: 'Cancelar',
+              })
+            }
+          />
         );
       },
     },
