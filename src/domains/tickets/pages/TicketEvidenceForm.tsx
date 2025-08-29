@@ -11,6 +11,7 @@ import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButt
 import BaseButton from '@/components/ui/baseButton';
 import LoadingOverlay from '@/components/ui/loadings/LoadingOverlay';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
+import { useValidatePermissionCurrentRole } from '@/domains/permissions/permissions';
 import { useAddToast } from '@/domains/toast';
 import { EMPTY_STRING } from '@/utils/constants';
 
@@ -23,6 +24,9 @@ export default function TicketEvidenceForm() {
 
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
+
+  const evidenceTicketPermission =
+    useValidatePermissionCurrentRole('tickets/evidence');
 
   const schema = Yup.object().shape({
     type: Yup.string().required('Requerido').default(EMPTY_STRING),
@@ -73,6 +77,10 @@ export default function TicketEvidenceForm() {
   const handleEvidenceDrop = (files: File[]) => {
     setEvidenceFiles(files);
   };
+
+  if (!evidenceTicketPermission) {
+    return <div>No tienes permisos para agregar evidencia a este ticket</div>;
+  }
 
   if (isLoading) {
     return <LoadingSection />;

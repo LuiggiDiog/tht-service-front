@@ -16,6 +16,7 @@ import Form, {
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import LoadingSection from '@/components/ui/loadings/LoadingSection';
+import { useValidatePermissionCurrentRole } from '@/domains/permissions/permissions';
 import { useAddToast } from '@/domains/toast';
 import { EMPTY_STRING } from '@/utils/constants';
 
@@ -27,6 +28,8 @@ export default function CustomerForm() {
 
   const { id } = useParams();
   const { data, isLoading } = useGetCustomer(id);
+
+  const editCustomer = useValidatePermissionCurrentRole('customers/edit');
 
   const schema = Yup.object().shape({
     name: Yup.string().required('Requerido').default(EMPTY_STRING),
@@ -68,6 +71,10 @@ export default function CustomerForm() {
     }
     return 'Nuevo cliente';
   };
+
+  if (!editCustomer) {
+    return <div>No tienes permisos para editar este cliente</div>;
+  }
 
   if (isLoading) {
     return <LoadingSection />;

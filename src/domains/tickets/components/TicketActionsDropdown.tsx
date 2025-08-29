@@ -12,12 +12,16 @@ import BaseButton from '@/components/ui/baseButton';
 
 type TicketActionsDropdownProps = {
   ticket: TicketDetailT;
+  evidenceTicketPermission: boolean;
+  changeStatusTicketPermission: boolean;
   onDeleteClick: () => void;
   onStatusChange: () => void;
 };
 
 export default function TicketActionsDropdown({
   ticket,
+  evidenceTicketPermission,
+  changeStatusTicketPermission,
   onDeleteClick,
   onStatusChange,
 }: TicketActionsDropdownProps) {
@@ -34,7 +38,7 @@ export default function TicketActionsDropdown({
           label: 'Agregar Evidencia',
           icon: mdiCamera,
           href: `/tickets/${ticket.id}/evidence`,
-          hidden: ticket.status !== 'in_progress',
+          hidden: !evidenceTicketPermission || ticket.status !== 'in_progress',
         },
       ],
       separator: true,
@@ -45,7 +49,10 @@ export default function TicketActionsDropdown({
           label: 'Poner en Progreso',
           icon: mdiPlay,
           onClick: onStatusChange,
-          hidden: ticket.status === 'in_progress' || ticket.status === 'closed',
+          hidden:
+            !changeStatusTicketPermission ||
+            ticket.status === 'in_progress' ||
+            ticket.status === 'closed',
         },
         {
           label: 'Cerrar Ticket',

@@ -13,6 +13,7 @@ import BaseButton from '@/components/ui/baseButton';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
 import useConfirmationModal from '@/components/ui/modals/hooks/useConfirmationModal';
 import { CustomerNameDisplay } from '@/domains/customers';
+import { useValidatePermissionCurrentRole } from '@/domains/permissions/permissions';
 import { UserNameDisplay } from '@/domains/users';
 
 export default function TicketList() {
@@ -23,6 +24,12 @@ export default function TicketList() {
     useConfirmationDeleteModal();
   const { openModal: openConfirmStateModal, Modal: ConfirmStateModal } =
     useConfirmationModal();
+
+  const evidenceTicketPermission =
+    useValidatePermissionCurrentRole('tickets/evidence');
+  const changeStatusTicketPermission = useValidatePermissionCurrentRole(
+    'tickets/change-status'
+  );
 
   const columns: Columns = [
     {
@@ -90,6 +97,8 @@ export default function TicketList() {
         return (
           <TicketActionsDropdown
             ticket={info}
+            evidenceTicketPermission={evidenceTicketPermission}
+            changeStatusTicketPermission={changeStatusTicketPermission}
             onDeleteClick={() =>
               confirmationOpenModal({
                 onConfirm: () => {

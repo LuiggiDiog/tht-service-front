@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { MenuAsideItem } from '../menuAside';
 import AsideMenuList from './AsideMenuList';
-import { getButtonColor } from '@/components/ui/baseButton/baseButton.util';
 import BaseIcon from '@/components/ui/BaseIcon';
+import { getButtonColor } from '@/components/ui/baseButton/baseButton.util';
+import { useAuthStore } from '@/domains/auth';
+import { validatePermissionItem } from '@/domains/permissions/permissions';
 
 type Props = {
   item: MenuAsideItem;
@@ -33,6 +35,12 @@ const AsideMenuItem = ({ item, isDropdownList = false }: Props) => {
   const asideMenuItemStyle = '';
   const asideMenuDropdownStyle = '';
   const activeClassAddon = '';
+
+  const currentUser = useAuthStore((state) => state.user);
+  const permission = validatePermissionItem({
+    id: currentUser?.role || '',
+    item,
+  });
 
   const asideMenuItemInnerContents = (
     <>
@@ -68,6 +76,8 @@ const AsideMenuItem = ({ item, isDropdownList = false }: Props) => {
       ? getButtonColor(item.color, false, true)
       : `${asideMenuItemStyle} text-slate-300 hover:text-white`,
   ].join(' ');
+
+  if (!permission) return null;
 
   return (
     <li>

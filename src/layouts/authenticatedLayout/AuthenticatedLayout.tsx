@@ -11,6 +11,7 @@ import { menuNavBar } from './menuNavBar';
 import BaseIcon from '@/components/ui/BaseIcon';
 import { MenuNavBarItem } from '@/components/ui/ui.types';
 import { useAuthStore } from '@/domains/auth';
+import { validatePermission } from '@/domains/permissions/permissions';
 
 type Props = {
   children?: ReactNode;
@@ -22,9 +23,11 @@ export default function AuthenticatedLayout(props: Props) {
   const { children, isDarkMode, company } = props;
 
   const isAuth = useAuthStore((state) => state.isAuth);
+  const currentUser = useAuthStore((state) => state.user);
   const [menuNavBarList] = useState<MenuNavBarItem[]>(menuNavBar);
 
   const location = useLocation();
+  const currentRoute = location.pathname.split('/')[1];
 
   const [isAsideMobileExpanded, setIsAsideMobileExpanded] = useState(false);
   const [isAsideLgActive, setIsAsideLgActive] = useState(false);
@@ -41,6 +44,17 @@ export default function AuthenticatedLayout(props: Props) {
   if (!isAuth) {
     return <Navigate replace state={{ from: location }} to="/" />;
   }
+
+  const handleValidateRoute = () => {
+    if (currentRoute === 'welcome') return true;
+
+    return validatePermission({
+      id: currentUser?.role || '',
+      route: currentRoute,
+    });
+  };
+
+  if (!handleValidateRoute()) return <Navigate replace to="/welcome" />;
 
   return (
     <div

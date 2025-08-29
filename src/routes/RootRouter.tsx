@@ -15,10 +15,10 @@ import { useSettingStore } from '@/domains/settings';
 import {
   TicketDetail,
   TicketDetailGuest,
+  TicketEdit,
   TicketEvidenceForm,
   TicketForm,
   TicketList,
-  TicketEdit,
 } from '@/domains/tickets';
 import TicketCloseForm from '@/domains/tickets/pages/TicketCloseForm';
 import { UserForm, UsersList } from '@/domains/users';

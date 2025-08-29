@@ -7,12 +7,16 @@ import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
 import BaseButton from '@/components/ui/baseButton';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
+import { useValidatePermissionCurrentRole } from '@/domains/permissions/permissions';
 
 export default function CustomersList() {
   const { data, isLoading } = useGetCustomers();
   const deleteCustomer = useDeleteCustomer();
   const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
     useConfirmationDeleteModal();
+
+  const editCustomerPermission =
+    useValidatePermissionCurrentRole('customers/edit');
 
   const columns: Columns = [
     {
@@ -67,29 +71,34 @@ export default function CustomersList() {
         const customer = row.original as CustomerT;
         return (
           <BaseActions>
-            <BaseButton
-              href={`/customers/${customer.id}`}
-              color="warning"
-              icon={mdiPencil}
-              label="Editar"
-              roundedFull
-              small
-            />
-            <BaseButton
-              color="danger"
-              icon={mdiDelete}
-              label="Eliminar"
-              onClick={() =>
-                confirmationOpenModal({
-                  message: `¿Estás seguro de eliminar al cliente ${customer.name} ${customer.last_name}?`,
-                  onConfirm: () => {
-                    deleteCustomer.mutate(customer.id);
-                  },
-                })
-              }
-              roundedFull
-              small
-            />
+            {editCustomerPermission && (
+              <BaseButton
+                href={`/customers/${customer.id}`}
+                color="warning"
+                icon={mdiPencil}
+                label="Editar"
+                roundedFull
+                small
+              />
+            )}
+
+            {editCustomerPermission && (
+              <BaseButton
+                color="danger"
+                icon={mdiDelete}
+                label="Eliminar"
+                onClick={() =>
+                  confirmationOpenModal({
+                    message: `¿Estás seguro de eliminar al cliente ${customer.name} ${customer.last_name}?`,
+                    onConfirm: () => {
+                      deleteCustomer.mutate(customer.id);
+                    },
+                  })
+                }
+                roundedFull
+                small
+              />
+            )}
           </BaseActions>
         );
       },
