@@ -25,8 +25,8 @@ export default function Login(props: Props) {
 
   const handleInitValues = () => {
     return {
-      email: 'admin@gmail.com',
-      password: 'password',
+      email: '',
+      password: '',
     } as LoginAuthT;
   };
 
