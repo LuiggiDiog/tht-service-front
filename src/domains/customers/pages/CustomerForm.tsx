@@ -29,7 +29,13 @@ export default function CustomerForm() {
   const { id } = useParams();
   const { data, isLoading } = useGetCustomer(id);
 
-  const editCustomer = useValidatePermissionCurrentRole('customers/edit');
+  // Permisos diferenciados según si es crear o editar
+  const hasPermissionToCreate = useValidatePermissionCurrentRole('customers');
+  const hasPermissionToEdit =
+    useValidatePermissionCurrentRole('customers/edit');
+
+  // Determinar si tiene permiso según la acción
+  const hasPermission = id ? hasPermissionToEdit : hasPermissionToCreate;
 
   const schema = Yup.object().shape({
     name: Yup.string().required('Requerido').default(EMPTY_STRING),
@@ -72,8 +78,21 @@ export default function CustomerForm() {
     return 'Nuevo cliente';
   };
 
-  if (!editCustomer) {
-    return <div>No tienes permisos para editar este cliente</div>;
+  // Validación de permisos con mensaje específico
+  if (!hasPermission) {
+    const action = id ? 'editar' : 'crear';
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Acceso denegado
+          </h2>
+          <p className="text-gray-600">
+            No tienes permisos para {action} clientes
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (isLoading) {
