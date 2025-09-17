@@ -17,3 +17,17 @@ export const getPaymentMethodLabel = (method: string) => {
   };
   return methods[method as keyof typeof methods] || method;
 };
+
+export const getStatusLabel = (status: string) => {
+  const statuses = {
+    open: 'Abierto',
+    in_progress: 'En Proceso',
+    closed: 'Cerrado',
+    pending: 'Pendiente',
+    completed: 'Completado',
+    cancelled: 'Cancelado',
+    delivered: 'Entregado',
+    // Puedes agregar más si tienes otros status
+  };
+  return statuses[status as keyof typeof statuses] || status;
+};

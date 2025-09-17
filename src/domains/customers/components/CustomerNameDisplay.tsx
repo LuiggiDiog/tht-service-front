@@ -1,3 +1,5 @@
+import { getCustomerName } from '../customers.utils';
+
 interface CustomerNameDisplayProps {
   customer: {
     name: string;
@@ -10,7 +12,7 @@ export default function CustomerNameDisplay({
 }: CustomerNameDisplayProps) {
   return (
     <span className="font-medium text-gray-900 dark:text-gray-100">
-      {customer.name} {customer.last_name}
+      {getCustomerName(customer)}
     </span>
   );
 }

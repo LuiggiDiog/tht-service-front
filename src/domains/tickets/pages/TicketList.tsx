@@ -7,6 +7,7 @@ import {
   useGetTickets,
 } from '../tickets.query';
 import { TicketDetailT, TicketT } from '../tickets.type';
+import { getStatusLabel } from '../tickets.utils';
 import TableCustom, { Columns } from '@/components/tableCustom';
 import SectionCustom from '@/components/ui/SectionCustom';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
@@ -14,6 +15,7 @@ import BaseButton from '@/components/ui/baseButton';
 import { useConfirmationDeleteModal } from '@/components/ui/modals';
 import useConfirmationModal from '@/components/ui/modals/hooks/useConfirmationModal';
 import { CustomerNameDisplay } from '@/domains/customers';
+import { getCustomerName } from '@/domains/customers/customers.utils';
 import { useValidatePermissionCurrentRole } from '@/domains/permissions/permissions';
 import { UserNameDisplay } from '@/domains/users';
 
@@ -41,6 +43,10 @@ export default function TicketList() {
     {
       header: 'Cliente',
       accessorKey: 'customer_id',
+      accessorFn: (row) => {
+        const info = row as TicketDetailT;
+        return getCustomerName(info.customer);
+      },
       cell: ({ row }) => {
         const info = row.original as TicketDetailT;
         return <CustomerNameDisplay customer={info.customer} />;
@@ -63,6 +69,10 @@ export default function TicketList() {
     {
       header: 'Ubicación',
       accessorKey: 'device_location',
+      accessorFn: (row) => {
+        const info = row as TicketDetailT;
+        return getLocationName(info.device_location);
+      },
       cell: ({ row }) => {
         const info = row.original as TicketDetailT;
         return getLocationName(info.device_location);
@@ -71,6 +81,10 @@ export default function TicketList() {
     {
       header: 'Estado',
       accessorKey: 'status',
+      accessorFn: (row) => {
+        const info = row as TicketDetailT;
+        return getStatusLabel(info.status);
+      },
       cell: ({ row }) => {
         const info = row.original as TicketDetailT;
         return <BadgeStatus status={info.status} />;
@@ -79,6 +93,10 @@ export default function TicketList() {
     {
       header: 'Ingresado por',
       accessorKey: 'created_by',
+      accessorFn: (row) => {
+        const info = row as TicketDetailT;
+        return info.created_by_user.name;
+      },
       cell: ({ row }) => {
         const info = row.original as TicketDetailT;
         return <UserNameDisplay user={info.created_by_user} />;
