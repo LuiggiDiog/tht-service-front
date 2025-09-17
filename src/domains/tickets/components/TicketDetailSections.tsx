@@ -9,36 +9,19 @@ import {
   mdiLink,
   mdiPhone,
 } from '@mdi/js';
+import { useDeviceLocationNameResolver } from '../hooks/useDeviceLocationName';
 import {
   TicketDetailT,
   TicketEvidenceMediaT,
   TicketEvidenceT,
   TicketPartChangeT,
 } from '../tickets.type';
+import { getEvidenceTypeLabel } from '../tickets.utils';
 import BadgeStatus from './BadgeStatus';
 import BaseIcon from '@/components/ui/BaseIcon';
 import CardBox from '@/components/ui/cardBox/CardBox';
 import { CustomerNameDisplay } from '@/domains/customers';
-
-const getEvidenceTypeLabel = (type: string) => {
-  const types = {
-    reception: 'Recepción',
-    part_removed: 'Pieza Removida',
-    part_installed: 'Pieza Instalada',
-    delivery: 'Entrega',
-  };
-  return types[type as keyof typeof types] || type;
-};
-
-const getPaymentMethodLabel = (method: string) => {
-  const methods = {
-    cash: 'Efectivo',
-    card: 'Tarjeta',
-    transfer: 'Transferencia',
-    check: 'Cheque',
-  };
-  return methods[method as keyof typeof methods] || method;
-};
+import { getPaymentMethodLabel } from '@/payments';
 
 export const TicketGeneralInfo = ({
   ticket,
@@ -183,36 +166,48 @@ export const TicketUserInfo = ({
   </CardBox>
 );
 
-export const TicketDeviceInfo = ({ ticket }: { ticket: TicketDetailT }) => (
-  <CardBox className="mb-6">
-    <div className="flex items-center mb-4">
-      <BaseIcon path={mdiCellphone} size={20} className="mr-2" />
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-        Dispositivo
-      </h3>
-    </div>
+export const TicketDeviceInfo = ({ ticket }: { ticket: TicketDetailT }) => {
+  const { getName } = useDeviceLocationNameResolver();
+  const locationLabel = getName(ticket.device_location);
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          Modelo:
-        </span>
-        <p className="text-gray-900 dark:text-gray-100">
-          {ticket.device_model}
-        </p>
+  return (
+    <CardBox className="mb-6">
+      <div className="flex items-center mb-4">
+        <BaseIcon path={mdiCellphone} size={20} className="mr-2" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Dispositivo
+        </h3>
       </div>
 
-      <div>
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          Número de Serie:
-        </span>
-        <p className="text-gray-900 dark:text-gray-100">
-          {ticket.device_serial}
-        </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Modelo:
+          </span>
+          <p className="text-gray-900 dark:text-gray-100">
+            {ticket.device_model}
+          </p>
+        </div>
+
+        <div>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Número de Serie:
+          </span>
+          <p className="text-gray-900 dark:text-gray-100">
+            {ticket.device_serial}
+          </p>
+        </div>
+
+        <div>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Ubicación del dispositivo:
+          </span>
+          <p className="text-gray-900 dark:text-gray-100">{locationLabel}</p>
+        </div>
       </div>
-    </div>
-  </CardBox>
-);
+    </CardBox>
+  );
+};
 
 export const TicketPaymentInfo = ({ ticket }: { ticket: TicketDetailT }) => (
   <CardBox className="mb-6">

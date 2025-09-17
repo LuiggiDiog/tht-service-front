@@ -1,5 +1,6 @@
 import { mdiFilePlusOutline } from '@mdi/js';
 import { BadgeStatus, TicketActionsDropdown } from '../components';
+import { useDeviceLocationNameResolver } from '../hooks/useDeviceLocationName';
 import {
   useChangeTicketStatus,
   useDeleteTicket,
@@ -20,6 +21,7 @@ export default function TicketList() {
   const { data, isLoading } = useGetTickets();
   const deleteTicket = useDeleteTicket();
   const changeTicketStatus = useChangeTicketStatus();
+  const { getName: getLocationName } = useDeviceLocationNameResolver();
   const { openModal: confirmationOpenModal, Modal: ConfirmationModal } =
     useConfirmationDeleteModal();
   const { openModal: openConfirmStateModal, Modal: ConfirmStateModal } =
@@ -56,6 +58,14 @@ export default function TicketList() {
             </p>
           </div>
         );
+      },
+    },
+    {
+      header: 'Ubicación',
+      accessorKey: 'device_location',
+      cell: ({ row }) => {
+        const info = row.original as TicketDetailT;
+        return getLocationName(info.device_location);
       },
     },
     {

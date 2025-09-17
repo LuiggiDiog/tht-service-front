@@ -4,9 +4,17 @@ import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
 
 import BadgeStatus from '../components/BadgeStatus';
+import { useDeviceLocationNameResolver } from '../hooks/useDeviceLocationName';
+import { useLocationOptions } from '../hooks/useLocationOptions';
 import { useGetTicket, usePutTicket } from '../tickets.query';
 import { TicketT } from '../tickets.type';
-import Form, { Field, FormField, ValuesFormT } from '@/components/form';
+import { getPaymentMethodLabel } from '../tickets.utils';
+import Form, {
+  Field,
+  FormField,
+  SelectField,
+  ValuesFormT,
+} from '@/components/form';
 import MoneyField from '@/components/form/components/MoneyField';
 import BaseDivider from '@/components/ui/BaseDivider';
 import SectionTitleLineWithButton from '@/components/ui/SectionTitleLineWithButton';
@@ -25,12 +33,15 @@ export default function TicketEdit() {
 
   const { id } = useParams();
   const { data, isLoading } = useGetTicket(id);
+  const { locationOptions } = useLocationOptions();
+  const { getName: getLocationName } = useDeviceLocationNameResolver();
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
 
   const schema = Yup.object().shape({
     amount: Yup.number()
       .required('El precio es requerido')
       .min(0, 'El precio debe ser mayor a 0'),
+    device_location: Yup.string().required('La ubicación es requerida'),
     // Aquí se pueden agregar más campos en el futuro
     // device_model: Yup.string().required('El modelo es requerido'),
     // description: Yup.string().required('La descripción es requerida'),
@@ -47,7 +58,10 @@ export default function TicketEdit() {
       const ticketData = {
         id: parseInt(id as string),
         amount: values.amount as number,
+        device_location: values.device_location as string,
       } as TicketT;
+
+      console.log('Datos a enviar para actualización:', ticketData);
 
       const resp = await putTicket.mutateAsync(ticketData);
 
@@ -84,7 +98,11 @@ export default function TicketEdit() {
   }
 
   return (
-    <Form data={{ amount: data.amount }} onSubmit={submit} schema={schema}>
+    <Form
+      data={{ amount: data.amount, device_location: data.device_location }}
+      onSubmit={submit}
+      schema={schema}
+    >
       <SectionTitleLineWithButton
         backBtn
         main
@@ -143,6 +161,12 @@ export default function TicketEdit() {
                   <span className="font-medium">{data.device_serial}</span>
                 </div>
                 <div>
+                  <span className="text-sm text-gray-500">Ubicación: </span>
+                  <span className="font-medium">
+                    {getLocationName(data.device_location)}
+                  </span>
+                </div>
+                <div>
                   <span className="text-sm text-gray-500">Estado: </span>
                   <BadgeStatus status={data.status} />
                 </div>
@@ -167,7 +191,9 @@ export default function TicketEdit() {
               <div className="space-y-2">
                 <div>
                   <span className="text-sm text-gray-500">Método: </span>
-                  <span className="font-medium">{data.payment_method}</span>
+                  <span className="font-medium">
+                    {getPaymentMethodLabel(data.payment_method)}
+                  </span>
                 </div>
                 <div>
                   <span className="text-sm text-gray-500">Abono inicial: </span>
@@ -233,6 +259,16 @@ export default function TicketEdit() {
               name="amount"
               component={MoneyField}
               placeholder="Ingresa el nuevo precio"
+            />
+          </FormField>
+
+          {/* Campo de Ubicación del Dispositivo */}
+          <FormField label="Ubicación del Dispositivo">
+            <Field
+              name="device_location"
+              component={SelectField}
+              options={locationOptions}
+              placeholder="Selecciona la ubicación"
             />
           </FormField>
 

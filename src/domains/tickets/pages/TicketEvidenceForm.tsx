@@ -2,6 +2,7 @@ import { mdiArrowLeft, mdiCamera } from '@mdi/js';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
+import { useDeviceLocationNameResolver } from '../hooks/useDeviceLocationName';
 import { useGetTicket, usePostTicketEvidence } from '../tickets.query';
 import { TicketEvidenceT } from '../tickets.type';
 import Form, { Field, FormField, ValuesFormT } from '@/components/form';
@@ -20,6 +21,7 @@ export default function TicketEvidenceForm() {
   const { id } = useParams();
   const postTicketEvidence = usePostTicketEvidence();
   const { data: ticket, isLoading } = useGetTicket(id);
+  const { getName: getLocationName } = useDeviceLocationNameResolver();
   const { success, error } = useAddToast();
 
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
@@ -155,6 +157,9 @@ export default function TicketEvidenceForm() {
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Dispositivo: {ticket.device_model} - {ticket.device_serial}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Ubicación: {getLocationName(ticket.device_location)}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Descripción: {ticket.description}

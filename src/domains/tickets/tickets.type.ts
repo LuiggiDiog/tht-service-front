@@ -8,6 +8,7 @@ export type TicketT = {
 
   device_model: string;
   device_serial: string;
+  device_location: string;
 
   description: string;
   amount: number;
@@ -29,6 +30,7 @@ export type TicketDetailT = {
   technician_id: string;
   device_model: string;
   device_serial: string;
+  device_location: string;
   description: string;
   amount: string;
   payment_method: string;

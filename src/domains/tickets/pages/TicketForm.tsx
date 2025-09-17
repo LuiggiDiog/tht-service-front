@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import * as Yup from 'yup';
 
+import { useLocationOptions } from '../hooks/useLocationOptions';
 import {
   useGetTicket,
   usePostTicket,
@@ -39,6 +40,7 @@ export default function TicketForm() {
   const { data, isLoading } = useGetTicket(id);
   const { customerOptions } = useCustomerOptions();
   const { paymentMethodOptions } = usePaymentMethodOptions();
+  const { locationOptions } = useLocationOptions();
 
   const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -47,6 +49,7 @@ export default function TicketForm() {
     customer_id: Yup.number().required('Requerido'),
     device_model: Yup.string().required('Requerido'),
     device_serial: Yup.string().required('Requerido'),
+    device_location: Yup.string().required('Requerido').default('in-branch'),
     description: Yup.string()
       .required('Requerido')
       .default(EMPTY_STRING)
@@ -152,6 +155,15 @@ export default function TicketForm() {
           name="device_serial"
           label="Serial de dispositivo"
           placeholder="Serial de dispositivo"
+        />
+      </FormField>
+
+      <FormField label="Ubicación del dispositivo">
+        <Field
+          name="device_location"
+          component={SelectField}
+          options={locationOptions}
+          placeholder="Selecciona la ubicación"
         />
       </FormField>
 
