@@ -41,7 +41,7 @@ export default function TicketEdit() {
     amount: Yup.number()
       .required('El precio es requerido')
       .min(0, 'El precio debe ser mayor a 0'),
-    device_location: Yup.string().required('La ubicación es requerida'),
+    device_location: Yup.string(),
     // Aquí se pueden agregar más campos en el futuro
     // device_model: Yup.string().required('El modelo es requerido'),
     // description: Yup.string().required('La descripción es requerida'),

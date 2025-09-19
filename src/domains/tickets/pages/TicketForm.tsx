@@ -49,7 +49,7 @@ export default function TicketForm() {
     customer_id: Yup.number().required('Requerido'),
     device_model: Yup.string().required('Requerido'),
     device_serial: Yup.string().required('Requerido'),
-    device_location: Yup.string().required('Requerido').default('in-branch'),
+    device_location: Yup.string(),
     description: Yup.string()
       .required('Requerido')
       .default(EMPTY_STRING)
